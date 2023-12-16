@@ -1,6 +1,6 @@
 import React from "react";
 import prisma from "@/lib/prisma";
-import DataTableDemo from "./[id]/components/Users";
+import DataTableDemo, { User } from "./[id]/components/Users";
 
  async function  page() {
   const users = await prisma.user.findMany({
@@ -13,7 +13,7 @@ import DataTableDemo from "./[id]/components/Users";
     },
   });
 
-  return <DataTableDemo users={users} />;
+  return <DataTableDemo users={users as User[]} />;
 }
 
 export default page;
