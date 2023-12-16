@@ -11,8 +11,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'OmSai-Optical',
-  description: 'Boiler plate app to generate dashboards',
+  title: 'ShivRaj Services',
+  description: 'We provode a on demand services',
 }
 
 export default function RootLayout({

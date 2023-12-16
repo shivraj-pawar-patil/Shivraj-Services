@@ -3,12 +3,13 @@ import prisma from "@/lib/prisma";
 import { TUserSchema } from "@/lib/type";
 import { revalidatePath } from "next/cache";
 
-export async function createUser(form: TUserSchema) {
+export async function createUser(form: TUserSchema, orgId: string) {
   const { name, gender, phone_no, location } = form;
   await prisma.user.create({
     data: {
       name,
       gender,
+      orgId,
       phoneNumber: phone_no.toString(),
       city: location,
     },

@@ -23,9 +23,10 @@ import { useToast } from "@/components/ui/use-toast";
 
 interface UserFormProps {
   user: User | null;
+  orgId: string;
 }
 
-export const UserForm = ({ user }: UserFormProps) => {
+export const UserForm = ({ user, orgId }: UserFormProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const form = useForm<TUserSchema>({
@@ -34,7 +35,7 @@ export const UserForm = ({ user }: UserFormProps) => {
       name: user?.name,
       gender: user?.gender,
       location: user?.city,
-      phone_no: user?.phoneNumber
+      phone_no: user?.phoneNumber,
     } || {
       name: "",
       gender: "",
@@ -48,25 +49,25 @@ export const UserForm = ({ user }: UserFormProps) => {
       console.log("[DATA-FORM]", data);
       if (user) {
         console.log(user);
-        await updateUser(data,user.id)
+        await updateUser(data, user.id);
         toast({
-          description: 'user was updated successfully !'
-        })
+          description: "user was updated successfully !",
+        });
         router.push("/users");
-        revalidatePath('/users')
+        revalidatePath("/users");
       } else {
-        await createUser(data);
+        await createUser(data, orgId);
         toast({
           description: "User was created successfully !",
         });
         router.push("/users");
-        revalidatePath('/users')
+        revalidatePath("/users");
       }
     } catch (e) {
-        toast({
-          description: 'Something went wrong. Please try again later',
-          variant: 'destructive',
-        })
+      toast({
+        description: "Something went wrong. Please try again later",
+        variant: "destructive",
+      });
       console.log("Error while creating user ", e);
     }
   };
@@ -149,7 +150,7 @@ export const UserForm = ({ user }: UserFormProps) => {
                     <FormLabel>Phone NO:</FormLabel>
                     <FormControl>
                       <Input
-                       type="number"
+                        type="number"
                         disabled={isLoading}
                         placeholder="Phone NO:"
                         {...field}
