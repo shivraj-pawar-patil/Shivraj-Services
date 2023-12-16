@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import React from "react";
 
 function SideBar() {
@@ -118,7 +119,7 @@ function SideBar() {
     <>
       <aside className="flex">
         <div className="flex flex-col items-center w-fit h-screen py-8 space-y-8 bg-white dark:bg-[#182235] dark:border-slate-700">
-            <img
+            <Image
               className="w-auto h-6"
               src="https://merakiui.com/images/logo.svg"
               alt=""
@@ -126,6 +127,7 @@ function SideBar() {
 
           {sidebar.map((_) => (
             <Link
+              key={_.path}
               href={_.path}
               className="pl-6 pr-6 pb-1.5 pt-1.5 text-gray-500 focus:outline-nones transition-colors duration-200 rounded-lg dark:text-gray-400 dark:hover:bg-gray-800 hover:bg-gray-100"
             >
