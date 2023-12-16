@@ -14,7 +14,7 @@ datasource db {
 
 model User {
   id        String     @default(uuid()) @id
-  orgId    String      @unique
+  orgId    String      
   name     String
   gender   String
   phoneNumber  String
