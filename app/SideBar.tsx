@@ -120,6 +120,8 @@ function SideBar() {
       <aside className="flex">
         <div className="flex flex-col items-center w-fit h-screen py-8 space-y-8 bg-white dark:bg-[#182235] dark:border-slate-700">
             <Image
+              width={12}
+              height={12}
               className="w-auto h-6"
               src="https://merakiui.com/images/logo.svg"
               alt=""
