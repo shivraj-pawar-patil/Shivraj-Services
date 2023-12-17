@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { deleteUser } from "@/actions/user";
+import { deleteUser } from "@/server/user";
 
 export type User = {
   id: string;

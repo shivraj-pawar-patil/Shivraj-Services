@@ -2,7 +2,6 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 import {
@@ -13,12 +12,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { revalidatePath } from "next/cache";
 import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { User } from "@prisma/client";
 import { TUserSchema, userSchema } from "@/lib/type";
-import { createUser, updateUser } from "@/actions/user";
+import { createUser, updateUser } from "@/server/user";
 import { useToast } from "@/components/ui/use-toast";
 
 interface UserFormProps {
@@ -164,26 +170,38 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
               />
 
               <FormField
-                name="type"
                 control={form.control}
+                name="type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={isLoading}
-                        placeholder="Type Of Patient"
-                        {...field}
-                      />
-                    </FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Type Of Patient" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {[
+                          "Dacryocystitis",
+                          "Cataract",
+                          "Pterygium",
+                          "Spectacles",
+                          "Follow-up",
+                        ].map((_) => (
+                          <SelectItem key={_} value={_}>{_}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <div className="w-full flex justify-center">
                 <Button disabled={isLoading}>
-                  <Plus className="h-5 w-5 mr-3" />
                   {user ? "Edit" : "Create"}
                 </Button>
               </div>
