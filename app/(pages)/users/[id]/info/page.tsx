@@ -15,8 +15,6 @@ const UserPage = async ({ params }: UserPageProps) => {
       orgId: orgId!
     },
   });
-
-  console.log("user--------------------------->",user,params);
   
   return <InfoForm user={user} orgId={orgId!} />;
 };

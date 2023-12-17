@@ -42,9 +42,8 @@ import { UserFormProps } from "./UserForm";
 import Link from "next/link";
 
 function InfoForm({ user, orgId }: UserFormProps) {
-  console.log("user--------->", user);
   const router = useRouter();
-  const [date, setDate] = React.useState<Date>(new Date());
+  const [date, setDate] = React.useState<Date>(user?.date ?? new Date());
   const form = useForm<TUserInfoSchema>({
     resolver: zodResolver(userInfoSchema),
     defaultValues: {
@@ -72,11 +71,8 @@ function InfoForm({ user, orgId }: UserFormProps) {
   });
 
   const onSubmit = async (data: TUserInfoSchema) => {
-    console.log("data-------->", data);
-
     try {
       if (user) {
-        console.log(user);
         await updateUserInfo(data, user.id);
         router.push("/users");
         revalidatePath("/users");
@@ -100,7 +96,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   <FormItem className="col-span-2 md:col-span-1">
                     <FormLabel>Name :</FormLabel>
                     <FormControl>
-                      <Input {...field} readOnly className="w-[600px]" />
+                      <Input {...field} readOnly className="w-80" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -113,7 +109,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-[280px] justify-start text-left font-normal !ml-0 ",
+                        "w-80 justify-start text-left font-normal !ml-0 ",
                         !date && "text-muted-foreground"
                       )}
                     >
@@ -139,7 +135,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   <FormItem className="col-span-2 md:col-span-1 !ml-0 !mt-2">
                     <FormLabel>Location :</FormLabel>
                     <FormControl>
-                      <Input {...field} readOnly className="w-[600px]" />
+                      <Input {...field} readOnly className="w-80" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -152,7 +148,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   <FormItem className="col-span-2 md:col-span-1 !ml-0 !mt-2">
                     <FormLabel>Age :</FormLabel>
                     <FormControl>
-                      <Input {...field} className="w-[282px]" />
+                      <Input {...field} className="w-80" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -160,8 +156,8 @@ function InfoForm({ user, orgId }: UserFormProps) {
               />
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
-              <Card className="w-[600px] bg-slate-800">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
+              <Card className="w-80 md:w-[600px] lg:md:w-[600px] bg-slate-800">
                 <CardHeader>
                   <CardTitle>Right Eye</CardTitle>
                   <CardDescription>
@@ -276,7 +272,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="w-[600px] bg-slate-800">
+              <Card className="w-80 md:w-[600px] lg:md:w-[600px] bg-slate-800">
                 <CardHeader>
                   <CardTitle>Left Eye</CardTitle>
                   <CardDescription>

@@ -58,7 +58,6 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
   const onSubmit = async (data: TUserSchema) => {
     try {
       if (user) {
-        console.log(user);
         await updateUser(data, user.id);
         toast({
           description: "user was updated successfully !",
