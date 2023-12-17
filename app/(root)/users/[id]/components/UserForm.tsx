@@ -36,11 +36,13 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
       gender: user?.gender,
       location: user?.city,
       phone_no: user?.phoneNumber,
+      type: user?.type,
     } || {
       name: "",
       gender: "",
       location: "",
       phone_no: "",
+      type: "",
     },
   });
   const isLoading = form.formState.isSubmitting;
@@ -153,6 +155,24 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                         type="number"
                         disabled={isLoading}
                         placeholder="Phone NO:"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                name="type"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="Type Of Patient"
                         {...field}
                       />
                     </FormControl>

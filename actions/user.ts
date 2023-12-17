@@ -4,12 +4,13 @@ import { TUserSchema } from "@/lib/type";
 import { revalidatePath } from "next/cache";
 
 export async function createUser(form: TUserSchema, orgId: string) {
-  const { name, gender, phone_no, location } = form;
+  const { name, gender, phone_no, location , type } = form;
   await prisma.user.create({
     data: {
       name,
       gender,
       orgId,
+      type,
       phoneNumber: phone_no.toString(),
       city: location,
     },
@@ -18,11 +19,12 @@ export async function createUser(form: TUserSchema, orgId: string) {
 }
 
 export async function updateUser(form: TUserSchema, id: string) {
-  const { name, gender, phone_no, location } = form;
+  const { name, gender, phone_no, location , type} = form;
   await prisma.user.update({
     data: {
       name,
       gender,
+      type,
       phoneNumber: phone_no.toString(),
       city: location,
     },

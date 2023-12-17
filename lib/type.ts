@@ -19,6 +19,11 @@ export const userSchema = z.object({
     .max(10, {
       message: "Number should be at most 10 characters",
     }),
+    type: z
+    .string()
+    .refine((value) => ["Dacryocystitis", "Cataract", "Pterygium", "Spectacles", "Follow-up"].includes(value), {
+      message: 'Type must be ["Dacryocystitis", "Cataract", "Pterygium", "Spectacles", "Follow-up"]',
+    }),  
 });
 
 export type TUserSchema = z.infer<typeof userSchema>;
