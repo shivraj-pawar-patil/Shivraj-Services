@@ -20,4 +20,6 @@ model User {
   phoneNumber  String
   city      String
   type      String   @default("Follow-up")
+  date      DateTime @default(now())
+  info      Json?
 }

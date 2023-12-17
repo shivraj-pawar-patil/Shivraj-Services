@@ -20,9 +20,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -103,6 +100,12 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => (
       <div>
         {" "}
+        <Link href={`/users/${row.getValue("id")}/info`}>
+          {" "}
+          <Button size={"sm"} variant={"outline"}>
+            Info
+          </Button>
+        </Link>
         <Link href={`/users/${row.getValue("id")}`}>
           {" "}
           <Button size={"sm"} variant={"outline"}>

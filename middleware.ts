@@ -11,9 +11,9 @@ export default authMiddleware({
     if (
       auth.userId &&
       !auth.orgId &&
-      req.nextUrl.pathname !== "/home"
+      req.nextUrl.pathname !== "/"
     ) {
-      const orgSelection = new URL("/home", req.url);
+      const orgSelection = new URL("/", req.url);
       return NextResponse.redirect(orgSelection);
     }
     // If the user is logged in and trying to access a protected route, allow them to access route

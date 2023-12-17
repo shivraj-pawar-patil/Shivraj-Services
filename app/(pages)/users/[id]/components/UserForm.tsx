@@ -27,8 +27,11 @@ import { TUserSchema, userSchema } from "@/lib/type";
 import { createUser, updateUser } from "@/server/user";
 import { useToast } from "@/components/ui/use-toast";
 
-interface UserFormProps {
-  user: User | null;
+interface Users extends User {
+ info: any
+}
+export interface UserFormProps {
+  user: Users | null;
   orgId: string;
 }
 
@@ -54,7 +57,6 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async (data: TUserSchema) => {
     try {
-      console.log("[DATA-FORM]", data);
       if (user) {
         console.log(user);
         await updateUser(data, user.id);
@@ -76,7 +78,6 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
         description: "Something went wrong. Please try again later",
         variant: "destructive",
       });
-      console.log("Error while creating user ", e);
     }
   };
 
