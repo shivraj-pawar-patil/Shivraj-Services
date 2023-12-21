@@ -34,6 +34,7 @@ import {
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { deleteUser } from "@/server/user";
+import { useToast } from "@/components/ui/use-toast";
 
 export type User = {
   id: string;
@@ -119,6 +120,7 @@ export const columns: ColumnDef<User>[] = [
 
 export default function DataTableDemo({ users }: { users: User[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const { toast } = useToast();
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
@@ -193,6 +195,10 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                     .getFilteredSelectedRowModel()
                     .rows.map((_) => _.original.id)
                 );
+                toast({
+                  description: "User was deleted succesfully!",
+                  variant:'destructive'
+                })
               }}
             >
               Delete

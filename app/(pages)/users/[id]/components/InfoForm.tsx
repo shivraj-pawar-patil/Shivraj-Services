@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -23,7 +22,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { revalidatePath } from "next/cache";
 import { Suspense } from "react";
 
 import { TUserInfoSchema, userInfoSchema } from "@/lib/type";
@@ -43,6 +41,7 @@ import Link from "next/link";
 
 function InfoForm({ user, orgId }: UserFormProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [date, setDate] = React.useState<Date>(user?.date ?? new Date());
   const form = useForm<TUserInfoSchema>({
     resolver: zodResolver(userInfoSchema),
@@ -75,10 +74,15 @@ function InfoForm({ user, orgId }: UserFormProps) {
       if (user) {
         await updateUserInfo(data, user.id);
         router.push("/users");
-        revalidatePath("/users");
+        toast({
+          description: "User info was updated!",
+        });
       }
     } catch (e) {
-      console.log(e);
+      toast({
+        description: "Something went wrong. Please try again later",
+        variant: "destructive",
+      });
     }
   };
   const isLoading = form.formState.isSubmitting;
@@ -93,7 +97,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                 name="name"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
+                  <FormItem className="col-span-2 md:col-span-1 mb-4">
                     <FormLabel>Name :</FormLabel>
                     <FormControl>
                       <Input {...field} readOnly className="w-80" />
@@ -132,7 +136,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                 name="location"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 !ml-0 !mt-2">
+                  <FormItem className="col-span-2 md:col-span-1 mb-4 !ml-0 !mt-2">
                     <FormLabel>Location :</FormLabel>
                     <FormControl>
                       <Input {...field} readOnly className="w-80" />
@@ -145,7 +149,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                 name="age"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 !ml-0 !mt-2">
+                  <FormItem className="col-span-2 md:col-span-1 mb-4 !ml-0 !mt-2">
                     <FormLabel>Age :</FormLabel>
                     <FormControl>
                       <Input {...field} className="w-80" />
@@ -156,8 +160,9 @@ function InfoForm({ user, orgId }: UserFormProps) {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-              <Card className="w-80 md:w-[600px] lg:md:w-[600px] bg-slate-800">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+              <Card className="w-full md:w-[600px] lg:w-[600px] bg-slate-800">
+                {/* <!-- ... Your existing Card content ... --> */}
                 <CardHeader>
                   <CardTitle>Right Eye</CardTitle>
                   <CardDescription>
@@ -165,17 +170,14 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex ">
-                    <div className="grid w-full grid-cols-4 gap-4 ">
-                      <FormLabel className="text-center">SPH</FormLabel>
-                      <FormLabel className="text-center">CYL</FormLabel>
-                      <FormLabel className="text-center">AXIS</FormLabel>
-                      <FormLabel className="text-center">VISION</FormLabel>
+                  <div className="grid text-center w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <FormLabel>SPH</FormLabel>
                       <FormField
                         name="rSPHu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -183,48 +185,26 @@ function InfoForm({ user, orgId }: UserFormProps) {
                           </FormItem>
                         )}
                       />
-                      <FormField
-                        name="rCYLu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1  ">
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="rAXISu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="rVISIONu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
                       <FormField
                         name="rSPHb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div>
+                      <FormLabel>CYL</FormLabel>
+                      <FormField
+                        name="rCYLu"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -236,7 +216,22 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="rCYLb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div>
+                      <FormLabel>AXIS</FormLabel>
+                      <FormField
+                        name="rAXISu"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -248,7 +243,22 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="rAXISb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div>
+                      <FormLabel>VISION</FormLabel>
+                      <FormField
+                        name="rVISIONu"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -260,7 +270,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="rVISIONb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -272,7 +282,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="w-80 md:w-[600px] lg:md:w-[600px] bg-slate-800">
+              <Card className="w-full md:w-[600px] lg:w-[600px] bg-slate-800">
                 <CardHeader>
                   <CardTitle>Left Eye</CardTitle>
                   <CardDescription>
@@ -280,17 +290,14 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex ">
-                    <div className="grid w-full grid-cols-4 gap-4 ">
-                      <FormLabel className="text-center">SPH</FormLabel>
-                      <FormLabel className="text-center">CYL</FormLabel>
-                      <FormLabel className="text-center">AXIS</FormLabel>
-                      <FormLabel className="text-center">VISION</FormLabel>
+                  <div className="grid w-full text-center grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <FormLabel>SPH</FormLabel>
                       <FormField
                         name="lSPHu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -298,35 +305,26 @@ function InfoForm({ user, orgId }: UserFormProps) {
                           </FormItem>
                         )}
                       />
+                      <FormField
+                        name="lSPHb"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div>
+                      <FormLabel>CYL</FormLabel>
                       <FormField
                         name="lCYLu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="lAXISu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="lVISIONu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -336,10 +334,10 @@ function InfoForm({ user, orgId }: UserFormProps) {
                       />
 
                       <FormField
-                        name="lSPHb"
+                        name="lCYLb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -347,11 +345,14 @@ function InfoForm({ user, orgId }: UserFormProps) {
                           </FormItem>
                         )}
                       />
+                    </div>
+                    <div>
+                      <FormLabel>AXIS</FormLabel>
                       <FormField
-                        name="lCYLb"
+                        name="lAXISu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -363,7 +364,22 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="lAXISb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div>
+                      <FormLabel>VISION</FormLabel>
+                      <FormField
+                        name="lVISIONu"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -375,7 +391,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="lVISIONb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1">
+                          <FormItem className="col-span-2 md:col-span-1 mb-4">
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -388,6 +404,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                 </CardContent>
               </Card>
             </div>
+
             <div className="flex mt-10 space-x-4 justify-center">
               <Link href={"/users"}>
                 {" "}

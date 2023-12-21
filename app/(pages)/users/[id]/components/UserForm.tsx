@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { revalidatePath } from "next/cache";
 import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { User } from "@prisma/client";
@@ -28,7 +27,7 @@ import { createUser, updateUser } from "@/server/user";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Users extends User {
- info: any
+  info: any;
 }
 export interface UserFormProps {
   user: Users | null;
@@ -63,14 +62,12 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
           description: "user was updated successfully !",
         });
         router.push("/users");
-        revalidatePath("/users");
       } else {
         await createUser(data, orgId);
         toast({
           description: "User was created successfully !",
         });
         router.push("/users");
-        revalidatePath("/users");
       }
     } catch (e) {
       toast({
@@ -192,7 +189,9 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                           "Spectacles",
                           "Follow-up",
                         ].map((_) => (
-                          <SelectItem key={_} value={_}>{_}</SelectItem>
+                          <SelectItem key={_} value={_}>
+                            {_}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -201,9 +200,7 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                 )}
               />
               <div className="w-full flex justify-center">
-                <Button disabled={isLoading}>
-                  {user ? "Edit" : "Create"}
-                </Button>
+                <Button disabled={isLoading}>{user ? "Edit" : "Create"}</Button>
               </div>
             </div>
           </form>
