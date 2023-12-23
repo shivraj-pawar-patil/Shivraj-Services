@@ -1,19 +1,41 @@
 "use server";
 import { auth } from "@clerk/nextjs";
 import moment from "moment";
-import {
-  Card,
-  DonutChart,
-  Title,
-  AreaChart,
-  Flex,
-} from "@tremor/react";
-
+import { Card, DonutChart, Title, AreaChart, Flex, Badge } from "@tremor/react";
 import React from "react";
 import prisma from "@/lib/prisma";
+
+type User = {
+  gender: string;
+  type: string;
+  date: Date;
+};
+
+const getCurrentYear = () => moment().get("year");
+
+const getGenderCount = (user: User[], condition: string) =>
+  user.filter((user) => user.gender.toLowerCase() === condition).length;
+
+const getMonthlyData = (monthIndex: number, users: User[]) => {
+  const month = moment().month(monthIndex);
+  const monthName = month.format("MMM");
+  const filteredUsers = users.filter(
+    (user) => user.date.getMonth() === monthIndex
+  );
+  return {
+    date: `${monthName} ${getCurrentYear()}`,
+    users: filteredUsers.length,
+    male: getGenderCount(filteredUsers, "male"),
+    female: getGenderCount(filteredUsers, "female"),
+  };
+};
+
+const getUserTypeCount = (type: string, users: User[]) =>
+  users.filter((u) => u.type === type).length;
+
 async function page() {
   const { orgId } = auth();
-  const users = await prisma?.user.findMany({
+  const users: User[] = await prisma?.user.findMany({
     select: {
       gender: true,
       type: true,
@@ -24,99 +46,30 @@ async function page() {
     },
   });
 
-  console.log("users", users);
-
   const userTypes = users.length
     ? [
-        {
-          type: "Dacryocystitis",
-          users: users.filter((u) => u.type == "Dacryocystitis").length,
-        },
-        {
-          type: "Cataract",
-          users: users.filter((u) => u.type == "Cataract").length,
-        },
-        {
-          type: "Pterygium",
-          users: users.filter((u) => u.type == "Pterygium").length,
-        },
-        {
-          type: "Spectacles",
-          users: users.filter((u) => u.type == "Spectacles").length,
-        },
-        {
-          type: "Follow-up",
-          users: users.filter((u) => u.type == "Follow-up").length,
-        },
-      ]
+        "Dacryocystitis",
+        "Cataract",
+        "Pterygium",
+        "Spectacles",
+        "Follow-up",
+      ].map((type) => ({
+        type,
+        users: getUserTypeCount(type, users),
+      }))
     : [];
 
   const genderdata = users.length
-    ? [
-        {
-          gender: "male",
-          users: users.filter((u) => u.gender == "male").length,
-        },
-        {
-          gender: "female",
-          users: users.filter((u) => u.gender == "female").length,
-        },
-      ]
+    ? ["male", "female"].map((gender) => ({
+        gender,
+        users: getGenderCount(users, gender),
+      }))
     : [];
 
-  const areaChartData = users.filter(
-    (_) => moment(_.date).get("year") == moment().get("year")
-  ).length
-    ? [
-        {
-          date: `Jan ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 0).length,
-        },
-        {
-          date: `Feb ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 1).length,
-        },
-        {
-          date: `Mar ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 2).length,
-        },
-        {
-          date: `Apr ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 3).length,
-        },
-        {
-          date: `May ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 4).length,
-        },
-        {
-          date: `Jun ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 5).length,
-        },
-        {
-          date: `Jul  ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 6).length,
-        },
-        {
-          date: `Aug  ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 7).length,
-        },
-        {
-          date: `Sep ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 8).length,
-        },
-        {
-          date: `Oct ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 9).length,
-        },
-        {
-          date: `Nov ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 10).length,
-        },
-        {
-          date: `Dec ${moment().get("year")}`,
-          users: users.filter((_) => _.date.getMonth() == 11).length,
-        },
-      ]
+  const areaChartData = users.length
+    ? Array.from({ length: 12 }, (_, monthIndex) =>
+        getMonthlyData(monthIndex, users)
+      )
     : [];
 
   return (
@@ -124,6 +77,21 @@ async function page() {
       <Flex className="m-4">
         <Card className="max m-2">
           <Title>User Type</Title>
+          <Badge size="xs" color="rose" className="mr-2 mt-1">
+            Dacryocystitis
+          </Badge>
+          <Badge size="xs" color="cyan" className="mr-2">
+            Cataract
+          </Badge>
+          <Badge size="xs" color="pink" className="mr-2">
+            Pterygium
+          </Badge>
+          <Badge size="xs" color="green" className="mr-2">
+            Spectacles
+          </Badge>
+          <Badge size="xs" color="blue">
+            Follow-up
+          </Badge>
           <DonutChart
             className="mt-6"
             variant="pie"
@@ -136,6 +104,12 @@ async function page() {
 
         <Card className="max  m-2">
           <Title>Gender</Title>
+          <Badge size="xs" color="rose" className="mr-2 mt-1">
+            Male
+          </Badge>
+          <Badge size="xs" color="cyan">
+            Female
+          </Badge>
           <DonutChart
             className="mt-6"
             variant="pie"
@@ -146,14 +120,14 @@ async function page() {
           />
         </Card>
       </Flex>
-      <Card className="m-4">
+      <Card className="m-5">
         <Title>Users over time</Title>
         <AreaChart
           className="h-72 mt-4"
           data={areaChartData}
           index="date"
-          categories={["users"]}
-          colors={["indigo", "cyan"]}
+          categories={["users", "male", "female"]}
+          colors={["indigo", "cyan", "pink"]}
         />
       </Card>
     </div>
