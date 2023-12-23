@@ -40,6 +40,7 @@ export async function updateUserInfo(form: TUserInfoSchema, id: string) {
     name,
     location,
     age,
+    date,
     rSPHu,
     rCYLu,
     rAXISu,
@@ -62,6 +63,7 @@ export async function updateUserInfo(form: TUserInfoSchema, id: string) {
     data: {
       name,
       city: location,
+      date,
       info: {
         age,
         rSPHu,

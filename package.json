@@ -22,12 +22,14 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/themes": "^2.0.2",
     "@tanstack/react-table": "^8.10.7",
+    "@tremor/react": "^3.12.1",
     "@vercel/postgres": "^0.5.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
     "framer-motion": "^10.16.16",
     "lucide-react": "^0.297.0",
+    "moment": "^2.29.4",
     "next": "14.0.3",
     "next-themes": "^0.2.1",
     "react": "^18",
@@ -40,6 +42,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

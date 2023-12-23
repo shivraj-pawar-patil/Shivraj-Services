@@ -125,7 +125,10 @@ function InfoForm({ user, orgId }: UserFormProps) {
                     <Calendar
                       mode="single"
                       selected={date}
-                      // onSelect={setDate}
+                      onSelect={(e) => {
+                        form.setValue("date", e);
+                        setDate(e as Date);
+                      }}
                       initialFocus
                     />
                   </PopoverContent>
@@ -415,6 +418,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   onSubmit({
                     name: form.getValues("name"),
                     age: form.getValues("age"),
+                    date: new Date(form.getValues("date") ?? ""),
                     location: form.getValues("location"),
                     rSPHu: form.getValues("rSPHu"),
                     rCYLu: form.getValues("rCYLu"),
