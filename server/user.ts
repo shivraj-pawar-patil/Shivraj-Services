@@ -57,6 +57,11 @@ export async function updateUserInfo(form: TUserInfoSchema, id: string) {
     lCYLb,
     lAXISb,
     lVISIONb,
+    totalAmount,
+    advance,
+    balance,
+    glass_type,
+    delevery_date
   } = form;
 
   await prisma.user.update({
@@ -66,6 +71,11 @@ export async function updateUserInfo(form: TUserInfoSchema, id: string) {
       date,
       info: {
         age,
+        totalAmount,
+        advance,
+        balance,
+        glass_type,
+        delevery_date,
         rSPHu,
         rCYLu,
         rAXISu,
