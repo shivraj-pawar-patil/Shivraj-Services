@@ -12,6 +12,7 @@ import { auth } from "@clerk/nextjs";
       phoneNumber: true,
       city: true,
       type: true,
+      info: true
     },
     where: {
       orgId: orgId!
