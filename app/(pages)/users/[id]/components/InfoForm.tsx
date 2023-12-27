@@ -50,10 +50,12 @@ function InfoForm({ user, orgId }: UserFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [date, setDate] = React.useState<Date>(
-    new Date(user?.date!) ?? new Date()
+    user?.date ? new Date(user?.date) : new Date()
   );
   const [deleveryDate, setDeleveryDate] = React.useState<Date | undefined>(
-    new Date(user?.info?.delevery_date) ?? undefined
+    user?.info?.delevery_date
+      ? new Date(user?.info?.delevery_date!)
+      : new Date()
   );
 
   React.useEffect(() => {
