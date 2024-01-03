@@ -11,22 +11,26 @@ type User = {
   date: Date;
 };
 
-const getCurrentYear = () => moment().get("year");
-
 const getGenderCount = (user: User[], condition: string) =>
   user.filter((user) => user.gender.toLowerCase() === condition).length;
 
 const getMonthlyData = (monthIndex: number, users: User[]) => {
   const month = moment().month(monthIndex);
   const monthName = month.format("MMM");
-  const filteredUsers = users.filter(
-    (user) => user.date.getMonth() === monthIndex
+  const curruntYear = users.filter(
+    (user) =>
+      user.date.getMonth() === monthIndex &&
+      user.date.getFullYear() == moment().get("year")
+  );
+  const previousYear = users.filter(
+    (user) =>
+      user.date.getMonth() === monthIndex &&
+      user.date.getFullYear() == moment().subtract(1, "year").get("year")
   );
   return {
-    date: `${monthName} ${getCurrentYear()}`,
-    users: filteredUsers.length,
-    male: getGenderCount(filteredUsers, "male"),
-    female: getGenderCount(filteredUsers, "female"),
+    date: `${monthName}`,
+    [moment().subtract(1, "year").get("year")]: previousYear.length,
+    [moment().get("year")]: curruntYear.length,
   };
 };
 
@@ -126,7 +130,10 @@ async function page() {
           className="h-72 mt-4"
           data={areaChartData}
           index="date"
-          categories={["users", "male", "female"]}
+          categories={[
+            moment().subtract(1, "year").get("year").toString(),
+            moment().get("year").toString(),
+          ]}
           colors={["indigo", "cyan", "pink"]}
         />
       </Card>
