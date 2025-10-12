@@ -225,8 +225,6 @@ href={
     },
   });
 
-  console.log(users)
-
   return (
     <div className="w-full p-6">
       <div className="flex items-center py-4">
