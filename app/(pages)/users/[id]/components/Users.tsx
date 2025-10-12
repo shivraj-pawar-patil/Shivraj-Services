@@ -117,29 +117,33 @@ export default function DataTableDemo({ users }: { users: User[] }) {
               Info
             </Button>
           </Link>{" "}
-          <Link
-            href={
-              `https://wa.me/91${row.original.phoneNumber}?text=` +
-              `Thank you for visiting the ${organization?.name}!` +
-              "%0a" +
-              "Name: " +
-              row.original.name +
-              "%0a" +
-              "Delevery Date: " +
-              moment(row.original?.info?.delevery_date).format("DD-MM-YYYY") +
-              "%0a" +
-              "Total Amount: " +
-              row.original?.info?.totalAmount +
-              "%0a" +
-              "Advance: " +
-              row.original?.info?.advance +
-              "%0a" +
-              "Balance: " +
-              row.original?.info?.balance +
-              "%0a" +
-              "Glass Type: " +
-              row.original?.info?.glass_type
-            }
+          <Link target="_blank"
+href={
+  `https://wa.me/91${row.original.phoneNumber}?text=` +
+  `Thank you ${row?.original?.name} for visiting the ${organization?.name}!` +
+  "%0a" +
+  "Name: " + row.original.name +
+  "%0a" +
+  "Delivery Date: " + moment(row.original?.info?.delevery_date).format("DD-MM-YYYY") +
+  "%0a" +
+  "Glass Type: " + row.original?.info?.glass_type +
+  "%0a------------------%0a" +
+  "👁️ Right Eye:" +
+  "%0aSPH: " + row.original?.info?.rSPHu + " / " + row.original?.info?.rSPHb +
+  "%0aCYL: " + row.original?.info?.rCYLu + " / " + row.original?.info?.rCYLb +
+  "%0aAXIS: " + row.original?.info?.rAXISu + " / " + row.original?.info?.rAXISb +
+  "%0aVISION: " + row.original?.info?.rVISIONu + " / " + row.original?.info?.rVISIONb +
+  "%0a------------------%0a" +
+  "👁️ Left Eye:" +
+  "%0aSPH: " + row.original?.info?.lSPHu + " / " + row.original?.info?.lSPHb +
+  "%0aCYL: " + row.original?.info?.lCYLu + " / " + row.original?.info?.lCYLb +
+  "%0aAXIS: " + row.original?.info?.lAXISu + " / " + row.original?.info?.lAXISb +
+  "%0aVISION: " + row.original?.info?.lVISIONu + " / " + row.original?.info?.lVISIONb +
+  "%0a------------------%0a" +
+  "Advance: ₹" + row.original?.info?.advance +
+  "%0aBalance: ₹" + row.original?.info?.balance
+}
+
           >
             <Button size={"sm"} variant={"outline"}>
               <svg
@@ -212,6 +216,8 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       rowSelection,
     },
   });
+
+  console.log(users)
 
   return (
     <div className="w-full p-6">
