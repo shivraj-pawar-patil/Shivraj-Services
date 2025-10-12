@@ -7,6 +7,7 @@ import { auth } from "@clerk/nextjs";
   const users = await prisma.user.findMany({
     select: {
       id: true,
+      intId: true,
       name: true,
       gender: true,
       phoneNumber: true,

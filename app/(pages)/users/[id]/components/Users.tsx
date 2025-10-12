@@ -39,6 +39,7 @@ import { useOrganization } from "@clerk/nextjs";
 
 export type User = {
   id: string;
+  intId: number;
   name: string;
   gender: "female" | "male";
   city: string;
@@ -69,6 +70,13 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       ),
       enableSorting: false,
       enableHiding: false,
+    },
+    {
+      accessorKey: "intId",
+      header: "ID",
+      cell: ({ row }) => (
+        <div className="lowercase">{row.getValue("intId")}</div>
+      ),
     },
     {
       accessorKey: "name",
@@ -122,19 +130,19 @@ href={
   `https://wa.me/91${row.original.phoneNumber}?text=` +
   `Thank you ${row?.original?.name} for visiting the ${organization?.name}!` +
   "%0a" +
-  "Name: " + row.original.name +
+  "ID: " + row?.original?.id +
   "%0a" +
   "Delivery Date: " + moment(row.original?.info?.delevery_date).format("DD-MM-YYYY") +
   "%0a" +
   "Glass Type: " + row.original?.info?.glass_type +
   "%0a------------------%0a" +
-  "👁️ Right Eye:" +
+  "Right Eye:" +
   "%0aSPH: " + row.original?.info?.rSPHu + " / " + row.original?.info?.rSPHb +
   "%0aCYL: " + row.original?.info?.rCYLu + " / " + row.original?.info?.rCYLb +
   "%0aAXIS: " + row.original?.info?.rAXISu + " / " + row.original?.info?.rAXISb +
   "%0aVISION: " + row.original?.info?.rVISIONu + " / " + row.original?.info?.rVISIONb +
   "%0a------------------%0a" +
-  "👁️ Left Eye:" +
+  "Left Eye:" +
   "%0aSPH: " + row.original?.info?.lSPHu + " / " + row.original?.info?.lSPHb +
   "%0aCYL: " + row.original?.info?.lCYLu + " / " + row.original?.info?.lCYLb +
   "%0aAXIS: " + row.original?.info?.lAXISu + " / " + row.original?.info?.lAXISb +
