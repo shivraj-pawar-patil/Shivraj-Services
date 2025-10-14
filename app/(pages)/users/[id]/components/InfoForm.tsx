@@ -311,7 +311,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-              <Card className="w-full md:w-[600px] lg:w-[600px] bg-slate-800">
+             <Card className="w-full md:w-[600px] lg:w-[600px] bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-200 dark:border-gray-700">
                 {/* <!-- ... Your existing Card content ... --> */}
                 <CardHeader>
                   <CardTitle>Right Eye</CardTitle>
@@ -432,7 +432,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="w-full md:w-[600px] lg:w-[600px] bg-slate-800">
+              <Card className="w-full md:w-[600px] lg:w-[600px] bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-200 dark:border-gray-700">
                 <CardHeader>
                   <CardTitle>Left Eye</CardTitle>
                   <CardDescription>
