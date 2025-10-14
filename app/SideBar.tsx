@@ -1,8 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import React from "react";
+import { Button } from "@/components/ui/button";
+import { X, Menu } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
-function SideBar() {
+interface SideBarProps {
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+function SideBar({ isOpen, onToggle }: SideBarProps) {
   const sidebar = [
     {
       path: "/users",
@@ -49,30 +57,110 @@ function SideBar() {
         </svg>
       ),
     },
+    {
+      path: "/theme-demo",
+      name: "Theme Demo",
+      Image: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          className="w-6 h-6"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"
+          />
+        </svg>
+      ),
+    },
   ];
   return (
     <>
-      <aside className="flex border-r print:hidden">
-        <div className="flex flex-col items-center w-fit h-screen py-8 space-y-8 bg-white dark:bg-[#182235] dark:border-slate-700">
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onToggle}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <aside className={`
+        fixed lg:static inset-y-0 left-0 z-50
+        transform transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        w-64 lg:w-fit
+        border-r print:hidden
+      `}>
+        <div className="flex flex-col h-full bg-card border-border theme-transition">
+          {/* Mobile Header */}
+          <div className="flex items-center justify-between p-4 lg:hidden border-b">
             <Image
               width={12}
               height={12}
               className="w-auto h-6"
               src="https://merakiui.com/images/logo.svg"
-              alt=""
+              alt="ShivRaj Services"
             />
-
-          {sidebar.map((_) => (
-            <Link
-              key={_.path}
-              href={_.path}
-              className="pl-6 pr-6 pb-1.5 pt-1.5 text-gray-500 focus:outline-nones transition-colors duration-200 rounded-lg dark:text-gray-400 dark:hover:bg-gray-800 hover:bg-gray-100"
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggle}
+              className="lg:hidden"
             >
-             <div
-             className="flex"
-             ><span>{_.Image}</span></div>
-            </Link>
-          ))}
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Desktop Logo */}
+          <div className="hidden lg:flex items-center justify-center py-8">
+            <Image
+              width={12}
+              height={12}
+              className="w-auto h-6"
+              src="https://merakiui.com/images/logo.svg"
+              alt="ShivRaj Services"
+            />
+          </div>
+
+          {/* Navigation Items */}
+          <nav className="flex flex-col px-4 lg:px-0 lg:items-center space-y-2 lg:space-y-8 py-4 lg:py-8">
+            {sidebar.map((item) => (
+              <Link
+                key={item.path}
+                href={item.path}
+                onClick={() => {
+                  // Close mobile menu when navigating
+                  if (window.innerWidth < 1024) {
+                    onToggle();
+                  }
+                }}
+                className={`
+                  flex items-center space-x-3 lg:space-x-0
+                  px-3 py-2 lg:pl-6 lg:pr-6 lg:pb-1.5 lg:pt-1.5
+                  text-muted-foreground 
+                  focus:outline-none transition-colors duration-200 
+                  rounded-lg hover:bg-accent hover:text-accent-foreground
+                  w-full lg:w-auto
+                `}
+              >
+                <span className="flex-shrink-0">{item.Image}</span>
+                <span className="lg:hidden text-sm font-medium">{item.name}</span>
+              </Link>
+            ))}
+          </nav>
+
+          {/* Mobile Theme Toggle */}
+          <div className="px-4 py-2 lg:hidden border-t">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Theme</span>
+              <ThemeToggle />
+            </div>
+          </div>
         </div>
       </aside>
     </>

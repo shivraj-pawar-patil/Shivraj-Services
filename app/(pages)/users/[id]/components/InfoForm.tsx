@@ -114,31 +114,31 @@ function InfoForm({ user, orgId }: UserFormProps) {
 
   return (
     <Suspense fallback="<div>Loading</div>">
-      <div suppressHydrationWarning>
+      <div suppressHydrationWarning className="min-h-screen bg-background">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="m-16">
-            <div className="my-5 grid grid-cols-2 space-x-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="p-4 md:p-8 lg:p-16 max-w-7xl mx-auto">
+            <div className="my-5 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <FormField
                 name="name"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="col-span-2 md:col-span-1 mb-4">
-                    <FormLabel>Name :</FormLabel>
+                    <FormLabel className="text-foreground font-medium">Name</FormLabel>
                     <FormControl>
-                      <Input {...field} readOnly className="w-80" />
+                      <Input {...field} readOnly className="w-full" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <div className="flex flex-col items-start justify-end !ml-0 ">
-                <FormLabel className="mb-2">Date :</FormLabel>
+              <div className="flex flex-col items-start justify-end">
+                <FormLabel className="mb-2 text-foreground font-medium">Date</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-80 justify-start text-left font-normal !ml-0 ",
+                        "w-full justify-start text-left font-normal",
                         !date && "text-muted-foreground"
                       )}
                     >
@@ -146,7 +146,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                       {date ? format(date, "PPP") : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
+                  <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
                       selected={date}
@@ -164,10 +164,10 @@ function InfoForm({ user, orgId }: UserFormProps) {
                 name="location"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4 !ml-0 !mt-2">
-                    <FormLabel>Location :</FormLabel>
+                  <FormItem className="col-span-2 md:col-span-1 mb-4">
+                    <FormLabel className="text-foreground font-medium">Location</FormLabel>
                     <FormControl>
-                      <Input {...field} readOnly className="w-80" />
+                      <Input {...field} readOnly className="w-full" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -177,25 +177,25 @@ function InfoForm({ user, orgId }: UserFormProps) {
                 name="age"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4 !ml-0 !mt-2">
-                    <FormLabel>Age :</FormLabel>
+                  <FormItem className="col-span-2 md:col-span-1 mb-4">
+                    <FormLabel className="text-foreground font-medium">Age</FormLabel>
                     <FormControl>
-                      <Input {...field} className="w-80" />
+                      <Input {...field} className="w-full" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <div className="flex flex-col items-start justify-center !ml-0 ">
-                <FormLabel className="mb-2">Delevery Date :</FormLabel>
+              <div className="flex flex-col items-start justify-center">
+                <FormLabel className="mb-2 text-foreground font-medium">Delivery Date</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-80 justify-start text-left font-normal !ml-0 ",
-                        !date && "text-muted-foreground"
+                        "w-full justify-start text-left font-normal",
+                        !deleveryDate && "text-muted-foreground"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
@@ -206,10 +206,10 @@ function InfoForm({ user, orgId }: UserFormProps) {
                       )}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
+                  <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={date}
+                      selected={deleveryDate}
                       onSelect={(e) => {
                         form.setValue("delevery_date", e);
                         setDeleveryDate(e as Date);
@@ -224,10 +224,10 @@ function InfoForm({ user, orgId }: UserFormProps) {
                 name="totalAmount"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4 !ml-0 !mt-2">
-                    <FormLabel>Total Amount :</FormLabel>
+                  <FormItem className="col-span-2 md:col-span-1 mb-4">
+                    <FormLabel className="text-foreground font-medium">Total Amount</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} className="w-80" />
+                      <Input type="number" {...field} className="w-full" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -238,13 +238,13 @@ function InfoForm({ user, orgId }: UserFormProps) {
                 control={form.control}
                 name="glass_type"
                 render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4 !ml-0 !mt-2">
-                    <FormLabel>Glass Type :</FormLabel>
+                  <FormItem className="col-span-2 md:col-span-1 mb-4">
+                    <FormLabel className="text-foreground font-medium">Glass Type</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
-                      <FormControl className="w-80">
+                      <FormControl className="w-full">
                         <SelectTrigger>
                           <SelectValue placeholder="Select Type Of Patient" />
                         </SelectTrigger>
@@ -263,7 +263,7 @@ function InfoForm({ user, orgId }: UserFormProps) {
                           "Progressive",
                           "Constant Use",
                           "Near Only",
-                          "For Distnace Only",
+                          "For Distance Only",
                           "Blue Cut Blue Coating",
                           "Blue Cut Hmc",
                           "Hc kt",
@@ -285,24 +285,24 @@ function InfoForm({ user, orgId }: UserFormProps) {
                 name="advance"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4 !ml-0 !mt-2">
-                    <FormLabel>Advance :</FormLabel>
+                  <FormItem className="col-span-2 md:col-span-1 mb-4">
+                    <FormLabel className="text-foreground font-medium">Advance</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} className="w-80" />
+                      <Input type="number" {...field} className="w-full" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <div></div>
+              
               <FormField
                 name="balance"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4 !ml-0 !mt-2">
-                    <FormLabel>Balance :</FormLabel>
+                  <FormItem className="col-span-2 md:col-span-1 mb-4">
+                    <FormLabel className="text-foreground font-medium">Balance</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} className="w-80" />
+                      <Input type="number" {...field} className="w-full" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -310,26 +310,25 @@ function InfoForm({ user, orgId }: UserFormProps) {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-             <Card className="w-full md:w-[600px] lg:w-[600px] bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-200 dark:border-gray-700">
-                {/* <!-- ... Your existing Card content ... --> */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+             <Card className="w-full">
                 <CardHeader>
-                  <CardTitle>Right Eye</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-foreground">Right Eye</CardTitle>
+                  <CardDescription className="text-muted-foreground">
                     Enter the details of right eye
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid text-center w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <FormLabel>SPH</FormLabel>
+                  <div className="grid text-center w-full grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <FormLabel className="text-foreground font-medium">SPH</FormLabel>
                       <FormField
                         name="rSPHu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Upper" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -339,24 +338,24 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="rSPHb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Bottom" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    <div>
-                      <FormLabel>CYL</FormLabel>
+                    <div className="space-y-2">
+                      <FormLabel className="text-foreground font-medium">CYL</FormLabel>
                       <FormField
                         name="rCYLu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Upper" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -366,24 +365,24 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="rCYLb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Bottom" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    <div>
-                      <FormLabel>AXIS</FormLabel>
+                    <div className="space-y-2">
+                      <FormLabel className="text-foreground font-medium">AXIS</FormLabel>
                       <FormField
                         name="rAXISu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Upper" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -393,24 +392,24 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="rAXISb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Bottom" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    <div>
-                      <FormLabel>VISION</FormLabel>
+                    <div className="space-y-2">
+                      <FormLabel className="text-foreground font-medium">VISION</FormLabel>
                       <FormField
                         name="rVISIONu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Upper" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -420,9 +419,9 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="rVISIONb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Bottom" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -432,24 +431,24 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="w-full md:w-[600px] lg:w-[600px] bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-200 dark:border-gray-700">
+              <Card className="w-full">
                 <CardHeader>
-                  <CardTitle>Left Eye</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-foreground">Left Eye</CardTitle>
+                  <CardDescription className="text-muted-foreground">
                     Enter the details of left eye
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid w-full text-center grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <FormLabel>SPH</FormLabel>
+                  <div className="grid w-full text-center grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <FormLabel className="text-foreground font-medium">SPH</FormLabel>
                       <FormField
                         name="lSPHu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Upper" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -459,24 +458,24 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="lSPHb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Bottom" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    <div>
-                      <FormLabel>CYL</FormLabel>
+                    <div className="space-y-2">
+                      <FormLabel className="text-foreground font-medium">CYL</FormLabel>
                       <FormField
                         name="lCYLu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Upper" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -487,24 +486,24 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="lCYLb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Bottom" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    <div>
-                      <FormLabel>AXIS</FormLabel>
+                    <div className="space-y-2">
+                      <FormLabel className="text-foreground font-medium">AXIS</FormLabel>
                       <FormField
                         name="lAXISu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Upper" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -514,24 +513,24 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="lAXISb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Bottom" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    <div>
-                      <FormLabel>VISION</FormLabel>
+                    <div className="space-y-2">
+                      <FormLabel className="text-foreground font-medium">VISION</FormLabel>
                       <FormField
                         name="lVISIONu"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Upper" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -541,9 +540,9 @@ function InfoForm({ user, orgId }: UserFormProps) {
                         name="lVISIONb"
                         control={form.control}
                         render={({ field }) => (
-                          <FormItem className="col-span-2 md:col-span-1 mb-4">
+                          <FormItem className="mb-2">
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="Bottom" className="text-center" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -555,10 +554,9 @@ function InfoForm({ user, orgId }: UserFormProps) {
               </Card>
             </div>
 
-            <div className="flex mt-10 space-x-4 justify-center">
-              <Link href={"/users"}>
-                {" "}
-                <Button variant="outline">Cancel</Button>
+            <div className="flex flex-col sm:flex-row mt-10 gap-4 justify-center">
+              <Link href={"/users"} className="w-full sm:w-auto">
+                <Button variant="outline" className="w-full sm:w-auto">Cancel</Button>
               </Link>
               <Button
                 onClick={() => {
@@ -597,8 +595,9 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   });
                 }}
                 disabled={isLoading}
+                className="w-full sm:w-auto"
               >
-                Save
+                {isLoading ? "Saving..." : "Save"}
               </Button>
             </div>
           </form>

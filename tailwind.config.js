@@ -11,7 +11,6 @@ module.exports = {
   theme: {
     transparent: "transparent",
     current: "currentColor",
-    darkMode: "class",
     extend: {
       colors: {
         "dark-tremor": {

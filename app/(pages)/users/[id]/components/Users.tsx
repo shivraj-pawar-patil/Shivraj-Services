@@ -119,18 +119,17 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       accessorKey: "id",
       header: "Action",
       cell: ({ row }) => (
-        <div>
-          {" "}
+        <div className="flex flex-wrap gap-1">
           <Link href={`/users/${row.getValue("id")}/info`}>
-            <Button size={"sm"} variant={"outline"}>
-             <FaInfo />
+            <Button size="sm" variant="outline" className="h-8 w-8 p-0">
+             <FaInfo className="h-3 w-3" />
             </Button>
-          </Link>{" "}
+          </Link>
           <Link href={`/qrcode/${row.getValue("id")}`}>
-            <Button size={"sm"} variant={"outline"}>
-             <FaQrcode />
+            <Button size="sm" variant="outline" className="h-8 w-8 p-0">
+             <FaQrcode className="h-3 w-3" />
             </Button>
-          </Link>{" "}
+          </Link>
           <Link
             target="_blank"
             href={
@@ -188,14 +187,13 @@ export default function DataTableDemo({ users }: { users: User[] }) {
               row.original?.info?.balance
             }
           >
-            <Button size={"sm"} variant={"outline"}>
-             <FaWhatsapp />
+            <Button size="sm" variant="outline" className="h-8 w-8 p-0">
+             <FaWhatsapp className="h-3 w-3" />
             </Button>
-          </Link>{" "}
+          </Link>
           <Link href={`/users/${row.getValue("id")}`}>
-            {" "}
-            <Button size={"sm"} variant={"outline"}>
-             <FaUserEdit />
+            <Button size="sm" variant="outline" className="h-8 w-8 p-0">
+             <FaUserEdit className="h-3 w-3" />
             </Button>
           </Link>
         </div>
@@ -231,72 +229,87 @@ export default function DataTableDemo({ users }: { users: User[] }) {
   });
 
   return (
-    <div className="w-full p-6">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Columns</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <div className="ml-auto">
-          {table.getFilteredSelectedRowModel().rows.length > 0 && (
-            <Button
-              variant="destructive"
-              className="mr-2"
-              size={"sm"}
-              onClick={async () => {
-                await deleteUser(
-                  table
-                    .getFilteredSelectedRowModel()
-                    .rows.map((_) => _.original.id)
-                );
-                toast({
-                  description: "User was deleted succesfully!",
-                  variant: "destructive",
-                });
-              }}
-            >
-              Delete
-            </Button>
-          )}
-          <Link href="/users/create-user">
-            {" "}
-            <Button size={"sm"} variant={"outline"}>
-              Create User
-            </Button>
-          </Link>
+    <div className="w-full p-4 md:p-6 min-h-screen bg-background">
+      <div className="space-y-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <h1 className="text-2xl font-bold text-foreground">Users</h1>
+          <div className="flex items-center gap-2 ml-auto">
+            <Link href="/users/create-user">
+              <Button size="sm" className="w-full sm:w-auto">
+                Create User
+              </Button>
+            </Link>
+          </div>
         </div>
-      </div>
-      <div className="rounded-md border">
-        <Table>
+
+        {/* Filters and Controls */}
+        <div className="flex flex-col sm:flex-row gap-4 py-4">
+          <div className="flex-1">
+            <Input
+              placeholder="Filter by name..."
+              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("name")?.setFilterValue(event.target.value)
+              }
+              className="w-full max-w-sm"
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full sm:w-auto">Columns</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="flex gap-2">
+            {table.getFilteredSelectedRowModel().rows.length > 0 && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={async () => {
+                  await deleteUser(
+                    table
+                      .getFilteredSelectedRowModel()
+                      .rows.map((_) => _.original.id)
+                  );
+                  toast({
+                    description: "User was deleted successfully!",
+                    variant: "destructive",
+                  });
+                }}
+                className="w-full sm:w-auto"
+              >
+                Delete
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="rounded-md border overflow-x-auto">
+          <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -345,28 +358,31 @@ export default function DataTableDemo({ users }: { users: User[] }) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
+          <div className="text-sm text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              className="w-full sm:w-auto"
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              className="w-full sm:w-auto"
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
     </div>

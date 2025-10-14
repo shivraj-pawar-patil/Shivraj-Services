@@ -5,7 +5,7 @@ import { auth } from '@clerk/nextjs';
 async function page() {
   const { orgId } = auth()
   return (
-    <div>
+    <div className="min-h-screen bg-background">
        <UserForm user={null} orgId={orgId!} />
     </div>
   );

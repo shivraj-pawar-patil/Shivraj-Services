@@ -80,131 +80,149 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
   return (
     <Suspense fallback="<div>Loading</div>">
       <div
-        className="h-full p-4 space-y-2 max-w-3xl mx-auto"
+        className="min-h-screen bg-background p-4 md:p-8 lg:p-16"
         suppressHydrationWarning
       >
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 pb-10"
-          >
-            <div className="space-y-2 w-full col-span-2">
-              <div>
-                <h3 className="text-lg font-medium">User</h3>
+        <div className="max-w-3xl mx-auto">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-6 md:space-y-8 pb-10"
+            >
+              <div className="space-y-2">
+                <h3 className="text-xl md:text-2xl font-semibold text-foreground">
+                  {user ? "Edit User" : "Create New User"}
+                </h3>
+                <p className="text-muted-foreground">
+                  {user ? "Update user information" : "Enter user details to create a new user"}
+                </p>
               </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-              <FormField
-                name="name"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={isLoading}
-                        placeholder="Enter your name"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="gender"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Gender</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={isLoading}
-                        placeholder="Enter your gender"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="location"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={isLoading}
-                        placeholder="City, Country"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="phone_no"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone NO:</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        disabled={isLoading}
-                        placeholder="Phone NO:"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+              
+              <div className="grid grid-cols-1 gap-4 md:gap-6">
+                <FormField
+                  name="name"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground font-medium">Name</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Type Of Patient" />
-                        </SelectTrigger>
+                        <Input
+                          disabled={isLoading}
+                          placeholder="Enter your name"
+                          className="w-full"
+                          {...field}
+                        />
                       </FormControl>
-                      <SelectContent>
-                        {[
-                          "Dacryocystitis",
-                          "Cataract",
-                          "Pterygium",
-                          "Spectacles",
-                          "Follow-up",
-                        ].map((_) => (
-                          <SelectItem key={_} value={_}>
-                            {_}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="w-full flex justify-center">
-                <Button disabled={isLoading}>{user ? "Edit" : "Create"}</Button>
-              </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  name="gender"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground font-medium">Gender</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={isLoading}
+                          placeholder="Enter your gender"
+                          className="w-full"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="location"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground font-medium">Location</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={isLoading}
+                          placeholder="City, Country"
+                          className="w-full"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="phone_no"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground font-medium">Phone Number</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="tel"
+                          disabled={isLoading}
+                          placeholder="Enter phone number"
+                          className="w-full"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground font-medium">Patient Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select Type Of Patient" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {[
+                            "Dacryocystitis",
+                            "Cataract",
+                            "Pterygium",
+                            "Spectacles",
+                            "Follow-up",
+                          ].map((_) => (
+                            <SelectItem key={_} value={_}>
+                              {_}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading}
+                    className="w-full sm:w-auto"
+                  >
+                    {isLoading ? "Processing..." : (user ? "Update User" : "Create User")}
+                  </Button>
+                </div>
             </div>
           </form>
         </Form>
+        </div>
       </div>
     </Suspense>
   );

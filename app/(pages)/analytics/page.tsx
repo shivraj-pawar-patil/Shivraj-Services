@@ -77,66 +77,142 @@ async function page() {
     : [];
 
   return (
-    <div className="pr-8">
-      <Flex className="m-4">
-        <Card className="max m-2">
-          <Title>User Type</Title>
-          <Badge size="xs" color="rose" className="mr-2 mt-1">
-            Dacryocystitis
-          </Badge>
-          <Badge size="xs" color="cyan" className="mr-2">
-            Cataract
-          </Badge>
-          <Badge size="xs" color="pink" className="mr-2">
-            Pterygium
-          </Badge>
-          <Badge size="xs" color="green" className="mr-2">
-            Spectacles
-          </Badge>
-          <Badge size="xs" color="blue">
-            Follow-up
-          </Badge>
-          <DonutChart
-            className="mt-6"
-            variant="pie"
-            data={userTypes ?? []}
-            category="users"
-            index="type"
-            colors={["rose", "cyan", "pink", "green", "blue"]}
-          />
+    <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-foreground">Analytics Dashboard</h1>
+          <p className="text-muted-foreground">
+            Insights and statistics about your users
+          </p>
+        </div>
+
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* User Type Chart */}
+          <Card className="p-6">
+            <div className="space-y-4">
+              <Title className="text-foreground">User Type Distribution</Title>
+              
+              {/* Legend */}
+              <div className="flex flex-wrap gap-2">
+                <Badge size="xs" color="rose">
+                  Dacryocystitis
+                </Badge>
+                <Badge size="xs" color="cyan">
+                  Cataract
+                </Badge>
+                <Badge size="xs" color="pink">
+                  Pterygium
+                </Badge>
+                <Badge size="xs" color="green">
+                  Spectacles
+                </Badge>
+                <Badge size="xs" color="blue">
+                  Follow-up
+                </Badge>
+              </div>
+              
+              {/* Chart */}
+              <div className="h-64 flex items-center justify-center">
+                <DonutChart
+                  className="w-full h-full"
+                  variant="pie"
+                  data={userTypes ?? []}
+                  category="users"
+                  index="type"
+                  colors={["rose", "cyan", "pink", "green", "blue"]}
+                />
+              </div>
+            </div>
+          </Card>
+
+          {/* Gender Chart */}
+          <Card className="p-6">
+            <div className="space-y-4">
+              <Title className="text-foreground">Gender Distribution</Title>
+              
+              {/* Legend */}
+              <div className="flex flex-wrap gap-2">
+                <Badge size="xs" color="rose">
+                  Male
+                </Badge>
+                <Badge size="xs" color="cyan">
+                  Female
+                </Badge>
+              </div>
+              
+              {/* Chart */}
+              <div className="h-64 flex items-center justify-center">
+                <DonutChart
+                  className="w-full h-full"
+                  variant="pie"
+                  data={genderdata ?? []}
+                  category="users"
+                  index="gender"
+                  colors={["rose", "cyan"]}
+                />
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Area Chart */}
+        <Card className="p-6">
+          <div className="space-y-4">
+            <Title className="text-foreground">Users Over Time</Title>
+            <div className="h-80 w-full">
+              <AreaChart
+                className="h-full w-full"
+                data={areaChartData}
+                index="date"
+                categories={[
+                  moment().subtract(1, "year").get("year").toString(),
+                  moment().get("year").toString(),
+                ]}
+                colors={["indigo", "cyan", "pink"]}
+              />
+            </div>
+          </div>
         </Card>
 
-        <Card className="max  m-2">
-          <Title>Gender</Title>
-          <Badge size="xs" color="rose" className="mr-2 mt-1">
-            Male
-          </Badge>
-          <Badge size="xs" color="cyan">
-            Female
-          </Badge>
-          <DonutChart
-            className="mt-6"
-            variant="pie"
-            data={genderdata ?? []}
-            category="users"
-            index="gender"
-            colors={["rose", "cyan"]}
-          />
-        </Card>
-      </Flex>
-      <Card className="m-5">
-        <Title>Users over time</Title>
-        <AreaChart
-          className="h-72 mt-4"
-          data={areaChartData}
-          index="date"
-          categories={[
-            moment().subtract(1, "year").get("year").toString(),
-            moment().get("year").toString(),
-          ]}
-          colors={["indigo", "cyan", "pink"]}
-        />
-      </Card>
+        {/* Summary Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-foreground">{users.length}</div>
+              <div className="text-sm text-muted-foreground">Total Users</div>
+            </div>
+          </Card>
+          
+          <Card className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-foreground">
+                {users.filter(user => user.date.getMonth() === new Date().getMonth()).length}
+              </div>
+              <div className="text-sm text-muted-foreground">This Month</div>
+            </div>
+          </Card>
+          
+          <Card className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-foreground">
+                {getGenderCount(users, "male")}
+              </div>
+              <div className="text-sm text-muted-foreground">Male Users</div>
+            </div>
+          </Card>
+          
+          <Card className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-foreground">
+                {getGenderCount(users, "female")}
+              </div>
+              <div className="text-sm text-muted-foreground">Female Users</div>
+            </div>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
