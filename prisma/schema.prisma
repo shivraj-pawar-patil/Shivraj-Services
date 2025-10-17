@@ -15,7 +15,8 @@ datasource db {
 model User {
   intId       Int      @id @default(autoincrement()) @map("int_id")
   id          String   @unique @default(uuid())
-  orgId    String      
+  orgId    String
+  from_camp    Boolean    
   name     String
   gender   String
   phoneNumber  String

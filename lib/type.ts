@@ -3,6 +3,7 @@ export const userSchema = z.object({
   name: z.string().min(1, {
     message: "Name is required.",
   }),
+  from_camp: z.boolean().optional(),
   gender: z
     .string()
     .refine((value) => ["male", "female"].includes(value.toLowerCase()), {

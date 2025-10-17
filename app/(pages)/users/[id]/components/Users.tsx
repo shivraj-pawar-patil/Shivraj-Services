@@ -32,11 +32,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import { deleteUser } from "@/server/user";
-import { useToast } from "@/components/ui/use-toast";
+import { deleteUser } from "@/server/user"; // Assumed path
+import { useToast } from "@/components/ui/use-toast"; // Assumed path
 import moment from "moment";
 import { useOrganization } from "@clerk/nextjs";
 import { FaQrcode, FaWhatsapp, FaInfo, FaUserEdit } from "react-icons/fa";
+
+// Utility function to check if a date is today
+const isToday = (date: Date | string) => {
+  const checkDate = moment(date);
+  return checkDate.isSame(moment(), 'day');
+};
 
 
 export type User = {
@@ -45,11 +51,19 @@ export type User = {
   name: string;
   gender: "female" | "male";
   city: string;
+  from_camp: boolean;
   phoneNumber: string;
   info: any;
+  // NOTE: Added createdAt field for "Today's Users" filter
+  date: Date | string; 
 };
+
 export default function DataTableDemo({ users }: { users: User[] }) {
   const { organization } = useOrganization();
+  
+  // State for manual filters
+  const [showTodayUsers, setShowTodayUsers] = React.useState(false);
+  
   const columns: ColumnDef<User>[] = [
     {
       id: "select",
@@ -116,6 +130,13 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       ),
     },
     {
+      accessorKey: "from_camp",
+      header: () => <div>From Camp</div>,
+      cell: ({ row }) => (
+        <div className="lowercase">{row.getValue("from_camp") ? "Yes" : "No"}</div>
+      ),
+    },
+    {
       accessorKey: "id",
       header: "Action",
       cell: ({ row }) => (
@@ -137,7 +158,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
               `Thank you ${row?.original?.name} for visiting the ${organization?.name}!` +
               "%0a" +
               "ID: " +
-              row?.original?.id +
+              row?.original?.intId +
               "%0a" +
               "Delivery Date: " +
               moment(row.original?.info?.delevery_date).format("DD-MM-YYYY") +
@@ -184,7 +205,9 @@ export default function DataTableDemo({ users }: { users: User[] }) {
               "Advance: ₹" +
               row.original?.info?.advance +
               "%0aBalance: ₹" +
-              row.original?.info?.balance
+              row.original?.info?.balance +
+              "%0a------------------%0a" +
+              "Please visit again after six month!"
             }
           >
             <Button size="sm" variant="outline" className="h-8 w-8 p-0">
@@ -200,6 +223,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       ),
     },
   ];
+  
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const { toast } = useToast();
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -208,15 +232,26 @@ export default function DataTableDemo({ users }: { users: User[] }) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  
+  // 1. Prepare data for "Today's Users" filter
+  const filteredUsers = React.useMemo(() => {
+    if (!showTodayUsers) {
+      return users;
+    }
+    return users.filter(user => isToday(user.date));
+  }, [users, showTodayUsers]);
+
 
   const table = useReactTable({
-    data: users,
+    // Use the potentially filtered data
+    data: filteredUsers,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    // Important: Use a custom filterFn for boolean columns like 'from_camp'
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
@@ -226,7 +261,27 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       columnVisibility,
       rowSelection,
     },
+    // Optional: Add custom filter function for 'from_camp' to handle boolean
+    // By default, TanStack Table stringifies the boolean, so we ensure proper boolean filtering.
+    // If you don't add this, filtering for true/false might not work as expected.
+    filterFns: {
+      booleanFilter: (row, columnId, value) => {
+        return row.getValue(columnId) === value;
+      },
+    },
+    // Apply the custom filter function to the 'from_camp' column definition if needed
+    // For simple boolean true/false checks, getFilteredRowModel() often works well enough
+    // when setting the filter value to a boolean, but this is a safer approach.
   });
+
+  // Ensure the 'from_camp' column uses the boolean filter if it's defined
+  React.useEffect(() => {
+    const fromCampColumn = table.getColumn("from_camp");
+    if (fromCampColumn) {
+        fromCampColumn.columnDef.filterFn = 'booleanFilter' as any;
+    }
+  }, [table]);
+
 
   return (
     <div className="w-full p-4 md:p-6 min-h-screen bg-background">
@@ -245,18 +300,52 @@ export default function DataTableDemo({ users }: { users: User[] }) {
 
         {/* Filters and Controls */}
         <div className="flex flex-col sm:flex-row gap-4 py-4">
-          <div className="flex-1">
+          
+          {/* Main Filters: Search, Today's Users, From Camp */}
+          <div className="flex flex-wrap gap-2 flex-1">
             <Input
               placeholder="Filter by name..."
               value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
               onChange={(event) =>
                 table.getColumn("name")?.setFilterValue(event.target.value)
               }
-              className="w-full max-w-sm"
+              className="w-full max-w-sm sm:max-w-xs"
             />
+            
+            {/* "Today's Users" Filter Button */}
+            <Button
+              variant={showTodayUsers ? "default" : "outline"}
+              onClick={() => setShowTodayUsers(prev => !prev)}
+              className="w-full sm:w-auto"
+            >
+              Today's Users
+            </Button>
+
+            {/* "From Camp" Filter Button */}
+            <Button
+              variant={
+                table.getColumn("from_camp")?.getFilterValue() === true
+                  ? "default"
+                  : "outline"
+              }
+              onClick={() => {
+                const currentFilter = table.getColumn("from_camp")?.getFilterValue();
+                // Toggle logic: true -> undefined (off)
+                if (currentFilter === true) {
+                  table.getColumn("from_camp")?.setFilterValue(undefined);
+                } else {
+                  // Set filter to true, so it only shows rows where from_camp is true
+                  table.getColumn("from_camp")?.setFilterValue(true);
+                }
+              }}
+              className="w-full sm:w-auto"
+            >
+              From Camp Only
+            </Button>
           </div>
 
-          <div className="flex gap-2">
+          {/* Column Visibility and Delete */}
+          <div className="flex gap-2 ml-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-full sm:w-auto">Columns</Button>
@@ -281,9 +370,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                   })}
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
 
-          <div className="flex gap-2">
             {table.getFilteredSelectedRowModel().rows.length > 0 && (
               <Button
                 variant="destructive"

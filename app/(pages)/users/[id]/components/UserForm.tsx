@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import {
   Form,
@@ -39,19 +40,23 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
   const { toast } = useToast();
   const form = useForm<TUserSchema>({
     resolver: zodResolver(userSchema),
-    defaultValues: {
-      name: user?.name,
-      gender: user?.gender,
-      location: user?.city,
-      phone_no: user?.phoneNumber,
-      type: user?.type,
-    } || {
-      name: "",
-      gender: "",
-      location: "",
-      phone_no: "",
-      type: "",
-    },
+    defaultValues: user
+      ? {
+          name: user.name ?? "",
+          gender: user.gender ?? "",
+          location: user.city ?? "",
+          phone_no: user.phoneNumber ?? "",
+          type: user.type ?? "",
+          from_camp: user.from_camp ?? false,
+        }
+      : {
+          name: "",
+          gender: "",
+          location: "",
+          phone_no: "",
+          type: "",
+          from_camp: undefined,
+        },
   });
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async (data: TUserSchema) => {
@@ -206,6 +211,23 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                         </SelectContent>
                       </Select>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="from_camp"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground font-medium">From Camp</FormLabel>
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage /> 
                     </FormItem>
                   )}
                 />

@@ -37,6 +37,26 @@ const getMonthlyData = (monthIndex: number, users: User[]) => {
 const getUserTypeCount = (type: string, users: User[]) =>
   users.filter((u) => u.type === type).length;
 
+/**
+ * Helper function to count users registered on the current date.
+ */
+const getTodayCount = (users: User[]): number => {
+    const today = moment().startOf('day');
+    return users.filter((user) => moment(user.date).isSame(today, 'day')).length;
+};
+
+/**
+ * Helper function to count users registered last month.
+ */
+const getLastMonthCount = (users: User[]): number => {
+    const lastMonthStart = moment().subtract(1, 'month').startOf('month');
+    const lastMonthEnd = moment().subtract(1, 'month').endOf('month');
+    return users.filter((user) => 
+        moment(user.date).isBetween(lastMonthStart, lastMonthEnd, 'day', '[]')
+    ).length;
+};
+
+
 async function page() {
   const { orgId } = auth();
   const users: User[] = await prisma?.user.findMany({
@@ -184,6 +204,15 @@ async function page() {
               <div className="text-sm text-muted-foreground">Total Users</div>
             </div>
           </Card>
+
+          <Card className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-foreground">
+                {getLastMonthCount(users)}
+              </div>
+              <div className="text-sm text-muted-foreground">Last Month</div>
+            </div>
+          </Card>
           
           <Card className="p-4">
             <div className="text-center">
@@ -197,20 +226,12 @@ async function page() {
           <Card className="p-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-foreground">
-                {getGenderCount(users, "male")}
+                {getTodayCount(users)}
               </div>
-              <div className="text-sm text-muted-foreground">Male Users</div>
+              <div className="text-sm text-muted-foreground">Today</div>
             </div>
           </Card>
           
-          <Card className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-foreground">
-                {getGenderCount(users, "female")}
-              </div>
-              <div className="text-sm text-muted-foreground">Female Users</div>
-            </div>
-          </Card>
         </div>
       </div>
     </div>
