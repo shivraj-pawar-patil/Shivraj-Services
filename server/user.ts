@@ -11,7 +11,7 @@ export async function createUser(form: TUserSchema, orgId: string) {
       gender,
       orgId,
       type,
-      from_camp,
+      from_camp: from_camp ?? false,
       phoneNumber: phone_no.toString(),
       city: location,
     },
@@ -24,7 +24,7 @@ export async function updateUser(form: TUserSchema, id: string) {
   await prisma.user.update({
     data: {
       name,
-      from_camp,
+      from_camp: from_camp ?? false,
       gender,
       type,
       phoneNumber: phone_no.toString(),
