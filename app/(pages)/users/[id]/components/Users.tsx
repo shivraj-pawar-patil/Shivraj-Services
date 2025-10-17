@@ -141,12 +141,12 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       header: "Action",
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-1">
-          <Link href={`/users/${row.getValue("id")}/info`}>
+          <Link href={`/users/${row.getValue("intId")}/info`}>
             <Button size="sm" variant="outline" className="h-8 w-8 p-0">
              <FaInfo className="h-3 w-3" />
             </Button>
           </Link>
-          <Link href={`/qrcode/${row.getValue("id")}`}>
+          <Link href={`/qrcode/${row.getValue("intId")}`}>
             <Button size="sm" variant="outline" className="h-8 w-8 p-0">
              <FaQrcode className="h-3 w-3" />
             </Button>
@@ -214,7 +214,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
              <FaWhatsapp className="h-3 w-3" />
             </Button>
           </Link>
-          <Link href={`/users/${row.getValue("id")}`}>
+          <Link href={`/users/${row.getValue("intId")}`}>
             <Button size="sm" variant="outline" className="h-8 w-8 p-0">
              <FaUserEdit className="h-3 w-3" />
             </Button>

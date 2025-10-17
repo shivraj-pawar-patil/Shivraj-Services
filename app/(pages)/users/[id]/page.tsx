@@ -4,14 +4,14 @@ import { UserForm } from "./components/UserForm";
 import { auth } from "@clerk/nextjs";
 interface UserPageProps {
   params: {
-    id: string;
+    id: number;
   };
 }
 const UserPage = async ({ params }: UserPageProps) => {
   const { orgId } = auth()
   const user = await prisma.user.findUnique({
     where: {
-      id: params.id,
+      intId: Number(params.id),
       orgId: orgId!
     },
   });
