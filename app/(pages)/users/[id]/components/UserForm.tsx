@@ -55,7 +55,7 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
           location: "",
           phone_no: "",
           type: "",
-          from_camp: undefined,
+          from_camp: false,
         },
   });
   const isLoading = form.formState.isSubmitting;
