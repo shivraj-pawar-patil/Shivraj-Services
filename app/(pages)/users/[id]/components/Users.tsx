@@ -318,7 +318,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
               onClick={() => setShowTodayUsers(prev => !prev)}
               className="w-full sm:w-auto"
             >
-              Today's Users
+              Today&apos;s Users
             </Button>
 
             {/* "From Camp" Filter Button */}
