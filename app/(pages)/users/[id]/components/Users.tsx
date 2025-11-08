@@ -32,18 +32,32 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import { deleteUser } from "@/server/user"; // Assumed path
-import { useToast } from "@/components/ui/use-toast"; // Assumed path
+import { deleteUser } from "@/server/user";
+import { useToast } from "@/components/ui/use-toast";
 import moment from "moment";
 import { useOrganization } from "@clerk/nextjs";
 import { FaQrcode, FaWhatsapp, FaInfo, FaUserEdit } from "react-icons/fa";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// ⬇️ NEW imports for calendar
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // Utility function to check if a date is today
 const isToday = (date: Date | string) => {
   const checkDate = moment(date);
-  return checkDate.isSame(moment(), 'day');
+  return checkDate.isSame(moment(), "day");
 };
-
 
 export type User = {
   id: string;
@@ -54,16 +68,19 @@ export type User = {
   from_camp: boolean;
   phoneNumber: string;
   info: any;
-  // NOTE: Added createdAt field for "Today's Users" filter
-  date: Date | string; 
+  date: Date | string;
+  type?: string;
 };
 
 export default function DataTableDemo({ users }: { users: User[] }) {
   const { organization } = useOrganization();
-  
-  // State for manual filters
-  const [showTodayUsers, setShowTodayUsers] = React.useState(false);
-  
+
+  // State for filters
+  const [type, setType] = React.useState("");
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
+    undefined
+  );
+
   const columns: ColumnDef<User>[] = [
     {
       id: "select",
@@ -90,50 +107,38 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     {
       accessorKey: "intId",
       header: "ID",
-      cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("intId")}</div>
-      ),
+      cell: ({ row }) => <div>{row.getValue("intId")}</div>,
     },
     {
       accessorKey: "name",
       header: "Name",
-      cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("name")}</div>
-      ),
+      cell: ({ row }) => <div>{row.getValue("name")}</div>,
     },
     {
       accessorKey: "type",
       header: "Type",
-      cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("type")}</div>
-      ),
+      cell: ({ row }) => <div>{row.getValue("type")}</div>,
     },
     {
       accessorKey: "gender",
       header: "Gender",
-      cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("gender")}</div>
-      ),
+      cell: ({ row }) => <div>{row.getValue("gender")}</div>,
     },
     {
       accessorKey: "city",
       header: "Location",
-      cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("city")}</div>
-      ),
+      cell: ({ row }) => <div>{row.getValue("city")}</div>,
     },
     {
       accessorKey: "phoneNumber",
       header: () => <div>Phone Number</div>,
-      cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("phoneNumber")}</div>
-      ),
+      cell: ({ row }) => <div>{row.getValue("phoneNumber")}</div>,
     },
     {
       accessorKey: "from_camp",
       header: () => <div>From Camp</div>,
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("from_camp") ? "Yes" : "No"}</div>
+        <div>{row.getValue("from_camp") ? "Yes" : "No"}</div>
       ),
     },
     {
@@ -143,12 +148,12 @@ export default function DataTableDemo({ users }: { users: User[] }) {
         <div className="flex flex-wrap gap-1">
           <Link href={`/users/${row.getValue("intId")}/info`}>
             <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-             <FaInfo className="h-3 w-3" />
+              <FaInfo className="h-3 w-3" />
             </Button>
           </Link>
           <Link href={`/qrcode/${row.getValue("intId")}`}>
             <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-             <FaQrcode className="h-3 w-3" />
+              <FaQrcode className="h-3 w-3" />
             </Button>
           </Link>
           <Link
@@ -211,19 +216,19 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             }
           >
             <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-             <FaWhatsapp className="h-3 w-3" />
+              <FaWhatsapp className="h-3 w-3" />
             </Button>
           </Link>
           <Link href={`/users/${row.getValue("intId")}`}>
             <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-             <FaUserEdit className="h-3 w-3" />
+              <FaUserEdit className="h-3 w-3" />
             </Button>
           </Link>
         </div>
       ),
     },
   ];
-  
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const { toast } = useToast();
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -232,18 +237,21 @@ export default function DataTableDemo({ users }: { users: User[] }) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  
-  // 1. Prepare data for "Today's Users" filter
-  const filteredUsers = React.useMemo(() => {
-    if (!showTodayUsers) {
-      return users;
-    }
-    return users.filter(user => isToday(user.date));
-  }, [users, showTodayUsers]);
 
+  // ✅ Filter by calendar date only
+  const filteredUsers = React.useMemo(() => {
+    let data = [...users].sort((a, b) => b.intId - a.intId);
+
+    if (selectedDate) {
+      data = data.filter((user) =>
+        moment(user.date).isSame(moment(selectedDate), "day")
+      );
+    }
+
+    return data;
+  }, [users, selectedDate]);
 
   const table = useReactTable({
-    // Use the potentially filtered data
     data: filteredUsers,
     columns,
     onSortingChange: setSorting,
@@ -251,7 +259,6 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    // Important: Use a custom filterFn for boolean columns like 'from_camp'
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
@@ -261,27 +268,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       columnVisibility,
       rowSelection,
     },
-    // Optional: Add custom filter function for 'from_camp' to handle boolean
-    // By default, TanStack Table stringifies the boolean, so we ensure proper boolean filtering.
-    // If you don't add this, filtering for true/false might not work as expected.
-    filterFns: {
-      booleanFilter: (row, columnId, value) => {
-        return row.getValue(columnId) === value;
-      },
-    },
-    // Apply the custom filter function to the 'from_camp' column definition if needed
-    // For simple boolean true/false checks, getFilteredRowModel() often works well enough
-    // when setting the filter value to a boolean, but this is a safer approach.
   });
-
-  // Ensure the 'from_camp' column uses the boolean filter if it's defined
-  React.useEffect(() => {
-    const fromCampColumn = table.getColumn("from_camp");
-    if (fromCampColumn) {
-        fromCampColumn.columnDef.filterFn = 'booleanFilter' as any;
-    }
-  }, [table]);
-
 
   return (
     <div className="w-full p-4 md:p-6 min-h-screen bg-background">
@@ -300,28 +287,20 @@ export default function DataTableDemo({ users }: { users: User[] }) {
 
         {/* Filters and Controls */}
         <div className="flex flex-col sm:flex-row gap-4 py-4">
-          
-          {/* Main Filters: Search, Today's Users, From Camp */}
           <div className="flex flex-wrap gap-2 flex-1">
+            {/* Search Filter */}
             <Input
               placeholder="Filter by name..."
-              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+              value={
+                (table.getColumn("name")?.getFilterValue() as string) ?? ""
+              }
               onChange={(event) =>
                 table.getColumn("name")?.setFilterValue(event.target.value)
               }
               className="w-full max-w-sm sm:max-w-xs"
             />
-            
-            {/* "Today's Users" Filter Button */}
-            <Button
-              variant={showTodayUsers ? "default" : "outline"}
-              onClick={() => setShowTodayUsers(prev => !prev)}
-              className="w-full sm:w-auto"
-            >
-              Today&apos;s Users
-            </Button>
 
-            {/* "From Camp" Filter Button */}
+            {/* From Camp Filter */}
             <Button
               variant={
                 table.getColumn("from_camp")?.getFilterValue() === true
@@ -329,12 +308,11 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                   : "outline"
               }
               onClick={() => {
-                const currentFilter = table.getColumn("from_camp")?.getFilterValue();
-                // Toggle logic: true -> undefined (off)
+                const currentFilter =
+                  table.getColumn("from_camp")?.getFilterValue();
                 if (currentFilter === true) {
                   table.getColumn("from_camp")?.setFilterValue(undefined);
                 } else {
-                  // Set filter to true, so it only shows rows where from_camp is true
                   table.getColumn("from_camp")?.setFilterValue(true);
                 }
               }}
@@ -342,32 +320,104 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             >
               From Camp Only
             </Button>
+
+            {/* ✅ Calendar Date Filter */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={selectedDate ? "default" : "outline"}
+                  className="w-full sm:w-auto"
+                >
+                  {selectedDate
+                    ? moment(selectedDate).format("DD MMM YYYY")
+                    : "Filter by Date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => setSelectedDate(date)}
+                  initialFocus
+                  modifiers={{
+                    today: new Date(),
+                  }}
+                  modifiersClassNames={{
+                    today:
+                      "bg-blue-500 text-white rounded-md hover:bg-blue-600",
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+
+            {selectedDate && (
+              <Button
+                variant="outline"
+                onClick={() => setSelectedDate(undefined)}
+                className="w-full sm:w-auto"
+              >
+                Clear Date
+              </Button>
+            )}
+
+            {/* Type Filter */}
+            <div>
+              <Select
+                onValueChange={(value) => {
+                  table
+                    .getColumn("type")
+                    ?.setFilterValue(
+                      value !== "Select Type Of Patient" ? value : undefined
+                    );
+                  setType(value);
+                }}
+                value={type}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Type Of Patient" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[
+                    "Select Type Of Patient",
+                    "Dacryocystitis",
+                    "Cataract",
+                    "Pterygium",
+                    "Spectacles",
+                    "Follow-up",
+                  ].map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {/* Column Visibility and Delete */}
+          {/* Column Visibility & Delete */}
           <div className="flex gap-2 ml-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full sm:w-auto">Columns</Button>
+                <Button variant="outline" className="w-full sm:w-auto">
+                  Columns
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {table
                   .getAllColumns()
                   .filter((column) => column.getCanHide())
-                  .map((column) => {
-                    return (
-                      <DropdownMenuCheckboxItem
-                        key={column.id}
-                        className="capitalize"
-                        checked={column.getIsVisible()}
-                        onCheckedChange={(value) =>
-                          column.toggleVisibility(!!value)
-                        }
-                      >
-                        {column.id}
-                      </DropdownMenuCheckboxItem>
-                    );
-                  })}
+                  .map((column) => (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -397,11 +447,10 @@ export default function DataTableDemo({ users }: { users: User[] }) {
         {/* Table */}
         <div className="rounded-md border overflow-x-auto">
           <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
@@ -410,41 +459,42 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                             header.getContext()
                           )}
                     </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pagination */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
           <div className="text-sm text-muted-foreground">
             {table.getFilteredSelectedRowModel().rows.length} of{" "}
