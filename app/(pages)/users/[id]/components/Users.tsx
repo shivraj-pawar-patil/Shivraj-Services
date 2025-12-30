@@ -160,7 +160,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             target="_blank"
             href={
               `https://wa.me/91${row.original.phoneNumber}?text=` +
-              `Thank you ${row?.original?.name} for visiting the ${organization?.name}!` +
+              `Thank you ${row?.original?.name} for visiting the Lions eye hospital vision center ${organization?.name}!` +
               "%0a" +
               "ID: " +
               row?.original?.intId +
