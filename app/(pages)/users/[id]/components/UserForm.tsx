@@ -96,7 +96,7 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
             >
               <div className="space-y-2">
                 <h3 className="text-xl md:text-2xl font-semibold text-foreground">
-                  {user ? "Edit User" : "Create New User"}
+                  {user ? "Edit Patient" : "Create New Patient"}
                 </h3>
                 <p className="text-muted-foreground">
                   {user ? "Update user information" : "Enter user details to create a new user"}
@@ -238,7 +238,7 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                     disabled={isLoading}
                     className="w-full sm:w-auto"
                   >
-                    {isLoading ? "Processing..." : (user ? "Update User" : "Create User")}
+                    {isLoading ? "Processing..." : (user ? "Update Patient" : "Create Patient")}
                   </Button>
                 </div>
             </div>

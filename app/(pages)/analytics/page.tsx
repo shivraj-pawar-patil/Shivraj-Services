@@ -180,7 +180,7 @@ async function page() {
         {/* Area Chart */}
         <Card className="p-6">
           <div className="space-y-4">
-            <Title className="text-foreground">Users Over Time</Title>
+            <Title className="text-foreground">Patients Over Time</Title>
             <div className="h-80 w-full">
               <AreaChart
                 className="h-full w-full"
@@ -201,7 +201,7 @@ async function page() {
           <Card className="p-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-foreground">{users.length}</div>
-              <div className="text-sm text-muted-foreground">Total Users</div>
+              <div className="text-sm text-muted-foreground">Total Patients</div>
             </div>
           </Card>
 

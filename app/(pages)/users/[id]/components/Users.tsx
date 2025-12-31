@@ -275,11 +275,11 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       <div className="space-y-4">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <h1 className="text-2xl font-bold text-foreground">Users</h1>
+          <h1 className="text-2xl font-bold text-foreground">Patients</h1>
           <div className="flex items-center gap-2 ml-auto">
             <Link href="/users/create-user">
               <Button size="sm" className="w-full sm:w-auto">
-                Create User
+                Create Patient
               </Button>
             </Link>
           </div>
