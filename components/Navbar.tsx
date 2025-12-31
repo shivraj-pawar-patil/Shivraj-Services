@@ -23,7 +23,7 @@ export const Navbar = ({ onMenuToggle }: NavbarProps) => {
               <Menu className="h-5 w-5" />
             </Button>
             
-            <h1 className="text-lg sm:text-xl font-semibold text-foreground">ShivRaj Services</h1>
+            <h1 className="text-lg sm:text-xl font-semibold text-foreground">Eye Optical Services</h1>
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-3">
