@@ -20,6 +20,8 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -44,6 +46,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { generateWhatsappMessage } from "@/lib/utils";
+import { MoreHorizontal } from "lucide-react";
 
 // ⬇️ NEW imports for calendar
 import { Calendar } from "@/components/ui/calendar";
@@ -144,88 +148,47 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     {
       accessorKey: "id",
       header: "Action",
-      cell: ({ row }) => (
-        <div className="flex flex-wrap gap-1">
-          <Link href={`/users/${row.getValue("intId")}/info`}>
-            <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-              <FaInfo className="h-3 w-3" />
-            </Button>
-          </Link>
-          <Link href={`/qrcode/${row.getValue("intId")}`}>
-            <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-              <FaQrcode className="h-3 w-3" />
-            </Button>
-          </Link>
-          <Link
-            target="_blank"
-            href={
-              `https://wa.me/91${row.original.phoneNumber}?text=` +
-              `Thank you ${row?.original?.name} for visiting the Lions eye hospital vision center ${organization?.name}!` +
-              "%0a" +
-              "ID: " +
-              row?.original?.intId +
-              "%0a" +
-              "Delivery Date: " +
-              moment(row.original?.info?.delevery_date).format("DD-MM-YYYY") +
-              "%0a" +
-              "Glass Type: " +
-              row.original?.info?.glass_type +
-              "%0a------------------%0a" +
-              "Right Eye:" +
-              "%0aSPH: " +
-              row.original?.info?.rSPHu +
-              " / " +
-              row.original?.info?.rSPHb +
-              "%0aCYL: " +
-              row.original?.info?.rCYLu +
-              " / " +
-              row.original?.info?.rCYLb +
-              "%0aAXIS: " +
-              row.original?.info?.rAXISu +
-              " / " +
-              row.original?.info?.rAXISb +
-              "%0aVISION: " +
-              row.original?.info?.rVISIONu +
-              " / " +
-              row.original?.info?.rVISIONb +
-              "%0a------------------%0a" +
-              "Left Eye:" +
-              "%0aSPH: " +
-              row.original?.info?.lSPHu +
-              " / " +
-              row.original?.info?.lSPHb +
-              "%0aCYL: " +
-              row.original?.info?.lCYLu +
-              " / " +
-              row.original?.info?.lCYLb +
-              "%0aAXIS: " +
-              row.original?.info?.lAXISu +
-              " / " +
-              row.original?.info?.lAXISb +
-              "%0aVISION: " +
-              row.original?.info?.lVISIONu +
-              " / " +
-              row.original?.info?.lVISIONb +
-              "%0a------------------%0a" +
-              "Advance: ₹" +
-              row.original?.info?.advance +
-              "%0aBalance: ₹" +
-              row.original?.info?.balance +
-              "%0a------------------%0a" +
-              "Please visit again after six month!"
-            }
-          >
-            <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-              <FaWhatsapp className="h-3 w-3" />
-            </Button>
-          </Link>
-          <Link href={`/users/${row.getValue("intId")}`}>
-            <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-              <FaUserEdit className="h-3 w-3" />
-            </Button>
-          </Link>
-        </div>
-      ),
+      cell: ({ row }) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const { organization } = useOrganization();
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <Link href={`/users/${row.getValue("intId")}/info`}>
+                <DropdownMenuItem>
+                  <FaInfo className="mr-2 h-4 w-4" /> View Info
+                </DropdownMenuItem>
+              </Link>
+              <Link href={`/qrcode/${row.getValue("intId")}`}>
+                <DropdownMenuItem>
+                  <FaQrcode className="mr-2 h-4 w-4" /> QR Code
+                </DropdownMenuItem>
+              </Link>
+              <Link
+                target="_blank"
+                href={generateWhatsappMessage(row.original, organization?.name || "")}
+              >
+                <DropdownMenuItem>
+                  <FaWhatsapp className="mr-2 h-4 w-4" /> WhatsApp
+                </DropdownMenuItem>
+              </Link>
+              <Link href={`/users/${row.getValue("intId")}`}>
+                <DropdownMenuItem>
+                  <FaUserEdit className="mr-2 h-4 w-4" /> Edit User
+                </DropdownMenuItem>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      },
     },
   ];
 
@@ -455,9 +418,9 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   ))}
                 </TableRow>

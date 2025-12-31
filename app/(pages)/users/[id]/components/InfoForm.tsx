@@ -69,11 +69,13 @@ function InfoForm({ user, orgId }: UserFormProps) {
       name: user?.name ?? "",
       location: user?.city ?? "",
       age: user?.info?.age ?? "",
-      date: user?.info?.date ?? "",
-      delevery_date: user?.info?.delevery_date ?? "",
-      totalAmount: user?.info?.totalAmount ?? 0,
-      advance: user?.info?.advance ?? 0,
-      balance: user?.info?.balance ?? 0,
+      date: user?.info?.date ? new Date(user.info.date) : undefined,
+      delevery_date: user?.info?.delevery_date
+        ? new Date(user.info.delevery_date)
+        : undefined,
+      totalAmount: user?.info?.totalAmount ?? "0",
+      advance: user?.info?.advance ?? "0",
+      balance: user?.info?.balance ?? "0",
       glass_type: user?.info?.glass_type ?? "",
       rSPHu: user?.info?.rSPHu ?? "",
       rCYLu: user?.info?.rCYLu ?? "",
@@ -114,492 +116,329 @@ function InfoForm({ user, orgId }: UserFormProps) {
 
   return (
     <Suspense fallback="<div>Loading</div>">
-      <div suppressHydrationWarning className="min-h-screen bg-background">
+      <div suppressHydrationWarning className="min-h-screen bg-muted/20 pb-10">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="p-4 md:p-8 lg:p-16 max-w-7xl mx-auto">
-            <div className="my-5 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              <FormField
-                name="name"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4">
-                    <FormLabel className="text-foreground font-medium">Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} readOnly className="w-full" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="flex flex-col items-start justify-end">
-                <FormLabel className="mb-2 text-foreground font-medium">Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="p-4 md:p-8 max-w-7xl mx-auto space-y-6"
+          >
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">Patient Prescription</h1>
+                <p className="text-muted-foreground">
+                  Manage patient details, prescription, and billing information.
+                </p>
+              </div>
+              <div className="flex gap-2 w-full md:w-auto">
+                <Link href={"/users"} className="w-full md:w-auto">
+                  <Button variant="outline" className="w-full">
+                    Cancel
+                  </Button>
+                </Link>
+                <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Left Column: Personal Info & Financials */}
+              <div className="space-y-6 md:col-span-1">
+                {/* Personal Info Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Patient Details</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <FormField
+                      name="name"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} readOnly className="bg-muted" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={(e) => {
-                        form.setValue("date", e);
-                        setDate(e as Date);
-                      }}
-                      initialFocus
                     />
-                  </PopoverContent>
-                </Popover>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        name="age"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Age</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        name="location"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Location</FormLabel>
+                            <FormControl>
+                              <Input {...field} readOnly className="bg-muted" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Important Dates */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Dates</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex flex-col space-y-2">
+                      <FormLabel>Registration Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "justify-start text-left font-normal",
+                              !date && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {date ? format(date, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={(e) => {
+                              if (e) {
+                                form.setValue("date", e);
+                                setDate(e);
+                              }
+                            }}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    <div className="flex flex-col space-y-2">
+                      <FormLabel>Delivery Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "justify-start text-left font-normal",
+                              !deleveryDate && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {deleveryDate ? (
+                              format(deleveryDate, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={deleveryDate}
+                            onSelect={(e) => {
+                              if (e) {
+                                form.setValue("delevery_date", e);
+                                setDeleveryDate(e);
+                              }
+                            }}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Financials */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Billing & Order</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="glass_type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Glass Type</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {[
+                                "Bifocal", "Kryptok", "Executive", "D Bifocal",
+                                "Photogrey", "SP", "Resilens", "High Index",
+                                "Ar.Coating", "Progressive", "Constant Use",
+                                "Near Only", "For Distance Only", "Blue Cut Blue Coating",
+                                "Blue Cut Hmc", "Hc kt", "Cr pg", "Pg glass",
+                              ].map((item) => (
+                                <SelectItem key={item} value={item}>
+                                  {item}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        name="totalAmount"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Total (₹)</FormLabel>
+                            <FormControl>
+                              <Input type="number" {...field}
+                                onChange={(e) => {
+                                  field.onChange(e);
+                                  // Auto-calc balance
+                                  const total = parseFloat(e.target.value) || 0;
+                                  const adv = parseFloat(form.getValues('advance')?.toString() || '0');
+                                  form.setValue('balance', (total - adv).toString());
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        name="advance"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Advance (₹)</FormLabel>
+                            <FormControl>
+                              <Input type="number" {...field}
+                                onChange={(e) => {
+                                  field.onChange(e);
+                                  // Auto-calc balance
+                                  const adv = parseFloat(e.target.value) || 0;
+                                  const total = parseFloat(form.getValues('totalAmount')?.toString() || '0');
+                                  form.setValue('balance', (total - adv).toString());
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      name="balance"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Balance (₹)</FormLabel>
+                          <FormControl>
+                            <Input type="number" {...field} readOnly className="bg-muted font-bold" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
               </div>
 
-              <FormField
-                name="location"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4">
-                    <FormLabel className="text-foreground font-medium">Location</FormLabel>
-                    <FormControl>
-                      <Input {...field} readOnly className="w-full" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="age"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4">
-                    <FormLabel className="text-foreground font-medium">Age</FormLabel>
-                    <FormControl>
-                      <Input {...field} className="w-full" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Right Column: Prescription */}
+              <div className="md:col-span-2 space-y-6">
+                <Card className="h-full">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Eye Prescription</CardTitle>
+                    <CardDescription>Enter the refraction details for both eyes.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-8">
+                    {/* Reusable Eye Section Function could be created, but keeping explicit for now */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 pb-2 border-b">
+                        <div className="h-6 w-1 bg-primary rounded-full" />
+                        <h3 className="font-semibold text-lg">Right Eye (OD)</h3>
+                      </div>
+                      <div className="grid grid-cols-4 gap-4 text-center">
+                        <div className="font-medium text-sm text-muted-foreground">SPH</div>
+                        <div className="font-medium text-sm text-muted-foreground">CYL</div>
+                        <div className="font-medium text-sm text-muted-foreground">AXIS</div>
+                        <div className="font-medium text-sm text-muted-foreground">VISION</div>
+                      </div>
+                      {/* Upper Row */}
+                      <div className="grid grid-cols-4 gap-4">
+                        <FormField name="rSPHu" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Dist." className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="rCYLu" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Dist." className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="rAXISu" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Dist." className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="rVISIONu" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Dist." className="text-center" /></FormControl></FormItem>} />
+                      </div>
+                      {/* Lower Row */}
+                      <div className="grid grid-cols-4 gap-4">
+                        <FormField name="rSPHb" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Near" className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="rCYLb" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Near" className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="rAXISb" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Near" className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="rVISIONb" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Near" className="text-center" /></FormControl></FormItem>} />
+                      </div>
+                    </div>
 
-              <div className="flex flex-col items-start justify-center">
-                <FormLabel className="mb-2 text-foreground font-medium">Delivery Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !deleveryDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {deleveryDate ? (
-                        format(deleveryDate, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={deleveryDate}
-                      onSelect={(e) => {
-                        form.setValue("delevery_date", e);
-                        setDeleveryDate(e as Date);
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                    <div className="space-y-4 pt-4">
+                      <div className="flex items-center gap-2 pb-2 border-b">
+                        <div className="h-6 w-1 bg-primary rounded-full" />
+                        <h3 className="font-semibold text-lg">Left Eye (OS)</h3>
+                      </div>
+                      <div className="grid grid-cols-4 gap-4 text-center">
+                        <div className="font-medium text-sm text-muted-foreground">SPH</div>
+                        <div className="font-medium text-sm text-muted-foreground">CYL</div>
+                        <div className="font-medium text-sm text-muted-foreground">AXIS</div>
+                        <div className="font-medium text-sm text-muted-foreground">VISION</div>
+                      </div>
+                      {/* Upper Row */}
+                      <div className="grid grid-cols-4 gap-4">
+                        <FormField name="lSPHu" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Dist." className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="lCYLu" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Dist." className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="lAXISu" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Dist." className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="lVISIONu" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Dist." className="text-center" /></FormControl></FormItem>} />
+                      </div>
+                      {/* Lower Row */}
+                      <div className="grid grid-cols-4 gap-4">
+                        <FormField name="lSPHb" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Near" className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="lCYLb" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Near" className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="lAXISb" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Near" className="text-center" /></FormControl></FormItem>} />
+                        <FormField name="lVISIONb" control={form.control} render={({ field }) => <FormItem><FormControl><Input {...field} placeholder="Near" className="text-center" /></FormControl></FormItem>} />
+                      </div>
+                    </div>
+
+                  </CardContent>
+                </Card>
               </div>
-
-              <FormField
-                name="totalAmount"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4">
-                    <FormLabel className="text-foreground font-medium">Total Amount</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} className="w-full" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="glass_type"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4">
-                    <FormLabel className="text-foreground font-medium">Glass Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl className="w-full">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Type Of Patient" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {[
-                          "Bifocal",
-                          "Kryptok",
-                          "Executive",
-                          "D Bifocal",
-                          "Photogrey",
-                          "SP",
-                          "Resilens",
-                          "High Index",
-                          "Ar.Coating",
-                          "Progressive",
-                          "Constant Use",
-                          "Near Only",
-                          "For Distance Only",
-                          "Blue Cut Blue Coating",
-                          "Blue Cut Hmc",
-                          "Hc kt",
-                          "Cr pg",
-                          "Pg glass",
-                        ].map((_) => (
-                          <SelectItem key={_} value={_}>
-                            {_}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="advance"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4">
-                    <FormLabel className="text-foreground font-medium">Advance</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} className="w-full" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                name="balance"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1 mb-4">
-                    <FormLabel className="text-foreground font-medium">Balance</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} className="w-full" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-             <Card className="w-full">
-                <CardHeader>
-                  <CardTitle className="text-foreground">Right Eye</CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    Enter the details of right eye
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid text-center w-full grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="space-y-2">
-                      <FormLabel className="text-foreground font-medium">SPH</FormLabel>
-                      <FormField
-                        name="rSPHu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Upper" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="rSPHb"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Bottom" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <FormLabel className="text-foreground font-medium">CYL</FormLabel>
-                      <FormField
-                        name="rCYLu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Upper" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="rCYLb"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Bottom" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <FormLabel className="text-foreground font-medium">AXIS</FormLabel>
-                      <FormField
-                        name="rAXISu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Upper" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="rAXISb"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Bottom" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <FormLabel className="text-foreground font-medium">VISION</FormLabel>
-                      <FormField
-                        name="rVISIONu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Upper" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="rVISIONb"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Bottom" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="w-full">
-                <CardHeader>
-                  <CardTitle className="text-foreground">Left Eye</CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    Enter the details of left eye
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid w-full text-center grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="space-y-2">
-                      <FormLabel className="text-foreground font-medium">SPH</FormLabel>
-                      <FormField
-                        name="lSPHu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Upper" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="lSPHb"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Bottom" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <FormLabel className="text-foreground font-medium">CYL</FormLabel>
-                      <FormField
-                        name="lCYLu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Upper" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        name="lCYLb"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Bottom" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <FormLabel className="text-foreground font-medium">AXIS</FormLabel>
-                      <FormField
-                        name="lAXISu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Upper" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="lAXISb"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Bottom" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <FormLabel className="text-foreground font-medium">VISION</FormLabel>
-                      <FormField
-                        name="lVISIONu"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Upper" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        name="lVISIONb"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem className="mb-2">
-                            <FormControl>
-                              <Input {...field} placeholder="Bottom" className="text-center" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="flex flex-col sm:flex-row mt-10 gap-4 justify-center">
-              <Link href={"/users"} className="w-full sm:w-auto">
-                <Button variant="outline" className="w-full sm:w-auto">Cancel</Button>
-              </Link>
-              <Button
-                onClick={() => {
-                  onSubmit({
-                    name: form.getValues("name"),
-                    age: form.getValues("age"),
-                    date: new Date(
-                      form.getValues("date") ?? user?.date ?? new Date()
-                    ),
-                    delevery_date: new Date(
-                      form.getValues("delevery_date") ??
-                        user?.info?.delevery_date ??
-                        undefined
-                    ),
-                    totalAmount: form.getValues("totalAmount"),
-                    balance: form.getValues("balance"),
-                    advance: form.getValues("advance"),
-                    glass_type: form.getValues("glass_type"),
-                    location: form.getValues("location"),
-                    rSPHu: form.getValues("rSPHu"),
-                    rCYLu: form.getValues("rCYLu"),
-                    rAXISu: form.getValues("rAXISu"),
-                    rVISIONu: form.getValues("rVISIONu"),
-                    rSPHb: form.getValues("rSPHb"),
-                    rCYLb: form.getValues("rCYLb"),
-                    rAXISb: form.getValues("rAXISb"),
-                    rVISIONb: form.getValues("rVISIONb"),
-                    lSPHu: form.getValues("lSPHu"),
-                    lCYLu: form.getValues("lCYLu"),
-                    lAXISu: form.getValues("lAXISu"),
-                    lVISIONu: form.getValues("lVISIONu"),
-                    lSPHb: form.getValues("lSPHb"),
-                    lCYLb: form.getValues("lCYLb"),
-                    lAXISb: form.getValues("lAXISb"),
-                    lVISIONb: form.getValues("lVISIONb"),
-                  });
-                }}
-                disabled={isLoading}
-                className="w-full sm:w-auto"
-              >
-                {isLoading ? "Saving..." : "Save"}
-              </Button>
-            </div>
+            {/* Hidden button to prevent enter key form submission issues if any, actual submit is in header */}
+            <button type="submit" hidden></button>
           </form>
         </Form>
       </div>

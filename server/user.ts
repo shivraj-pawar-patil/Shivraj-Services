@@ -4,7 +4,7 @@ import { TUserInfoSchema, TUserSchema } from "@/lib/type";
 import { revalidatePath } from "next/cache";
 
 export async function createUser(form: TUserSchema, orgId: string) {
-  const { name, gender, phone_no, location, type , from_camp } = form;
+  const { name, gender, phone_no, location, type, from_camp } = form;
   await prisma.user.create({
     data: {
       name,
@@ -20,7 +20,7 @@ export async function createUser(form: TUserSchema, orgId: string) {
 }
 
 export async function updateUser(form: TUserSchema, id: string) {
-  const { name, gender, phone_no, location, type , from_camp } = form;
+  const { name, gender, phone_no, location, type, from_camp } = form;
   await prisma.user.update({
     data: {
       name,
@@ -112,4 +112,26 @@ export async function deleteUser(Ids: string[]) {
     },
   });
   revalidatePath("/users");
+}
+
+export async function searchUsers(query: string, orgId: string) {
+  if (!query || query.length < 2) return [];
+
+  return await prisma.user.findMany({
+    where: {
+      orgId,
+      name: {
+        contains: query,
+        mode: 'insensitive' // Case insensitive search
+      }
+    },
+    select: {
+      id: true,
+      intId: true,
+      name: true,
+      phoneNumber: true,
+      city: true
+    },
+    take: 5 // Limit results
+  });
 }

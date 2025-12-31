@@ -1,11 +1,11 @@
 'use client';
 
-// Removed: import { useParams } from 'next/navigation'; - Not needed anymore
 import { QRCodeSVG } from 'qrcode.react';
-
 import React from 'react';
-import { Printer, User, Mail, Smartphone } from 'lucide-react';
-
+import { Printer, MapPin, ArrowLeft, Phone, User } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 interface UserQRCodeClientProps {
     userId: number;
@@ -14,124 +14,126 @@ interface UserQRCodeClientProps {
 }
 
 const UserQRCodeClient = ({ userId, userData, baseUrl }: UserQRCodeClientProps) => {
-    // Removed: const params = useParams();
-    // Removed: const userId = params.userId as string;
-    // Removed: const userData = MOCK_USER_DATA;
+    const [origin, setOrigin] = React.useState(baseUrl);
 
-    console.log('User Data in Client Component:', userData);
+    React.useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setOrigin(window.location.origin);
+        }
+    }, []);
 
-    // The URL encoded in the QR code
-    const url = `${baseUrl}/users/${userId}/info`;
+    // Ensure we point to the patient info page
+    const url = `${origin}/users/${userId}/info`;
 
     const handlePrint = () => {
-        // This triggers the browser's native print dialogue
         window.print();
     };
 
-    // Helper component for details
-    // It's good practice to keep helper components outside the main render function
-    // or memoize them, but for brevity, we'll keep it simple for now.
-    const UserDetail = ({ Icon, label, value }: { Icon: React.ElementType, label: string, value: string }) => (
-        <div className="flex items-center text-gray-700 dark:text-gray-300">
-            <Icon className="w-5 h-5 mr-3 flex-shrink-0" />
-            <div className="flex flex-col">
-                <span className="text-sm font-semibold">{label}</span>
-                <span className="text-base break-words">{value}</span>
-            </div>
-        </div>
-    );
-
     return (
-        <div className="flex flex-col items-center justify-start py-10 px-4 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors print:bg-white print:text-black print:min-h-0">
+        <div className="min-h-screen bg-muted/20 flex flex-col items-center py-10 px-4 transition-colors print:p-0 print:bg-white print:min-h-0 print:justify-center">
 
-            <h1 className="text-3xl font-extrabold mb-8 text-indigo-600 dark:text-indigo-400 print:hidden">
-                User Profile & QR Code
-            </h1>
-
-            {/* Printable Area Container */}
-            <div
-                id="printable-area"
-                className="flex flex-col md:flex-row bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-4xl space-y-8 md:space-y-0 md:space-x-10 print:shadow-none print:p-0 print:border-none print:block print:w-auto"
-            >
-
-                {/* User Info (Left/Top) */}
-                <div className="flex-1 space-y-5 border-b pb-8 md:border-b-0 md:border-r md:pr-10 print:border-r-0 print:pb-0 print:pr-0 print:pt-4">
-                    <div className="flex items-center space-x-4">
-                        <User className="w-8 h-8 text-indigo-500" />
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 print:text-black">
-                            {userData.name}
-                        </h2>
-                    </div>
-
-                    <UserDetail
-                        Icon={Mail}
-                        label="city"
-                        value={userData.city}
-                    />
-                    <UserDetail
-                        Icon={Smartphone}
-                        label="Phone"
-                        value={userData.phoneNumber}
-                    />
-                    <UserDetail
-                        Icon={User}
-                        label="User ID"
-                        value={userData.intId.toString()}
-                    />
-                     <UserDetail
-                        Icon={User}
-                        label="Type"
-                        value={userData.type}
-                    />
-                </div>
-
-                {/* QR Code (Right/Bottom) - This part contains the QR and scan instruction */}
-                <div className="flex flex-col items-center justify-center flex-shrink-0 pt-8 md:pt-0">
-                    <div className="p-2 border-4 border-gray-200 rounded-lg bg-white shadow-xl print:shadow-none print:border-gray-400">
-                        <QRCodeSVG value={url} size={200} bgColor="#ffffff" includeMargin />
-                    </div>
-                    <p className="mt-4 text-center text-lg font-medium text-gray-600 dark:text-gray-300 print:text-black">
-                        Scan to fetch user data
-                    </p>
-                    <p className="mt-2 text-center text-xs text-indigo-500 dark:text-indigo-400 print:text-gray-600">
-                        {url}
-                    </p>
-                </div>
+            {/* Navigation & Actions - Hidden in Print */}
+            <div className="w-full max-w-md flex justify-between items-center mb-8 print:hidden">
+                <Link href="/users">
+                    <Button variant="ghost" className="gap-2">
+                        <ArrowLeft className="h-4 w-4" /> Back to Users
+                    </Button>
+                </Link>
+                <Button onClick={handlePrint} className="gap-2">
+                    <Printer className="h-4 w-4" /> Print Card
+                </Button>
             </div>
 
-            {/* Print Button (Hidden in Print View) */}
-            <button
-                onClick={handlePrint}
-                className="mt-12 flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 print:hidden"
-            >
-                <Printer className="w-5 h-5 mr-2" />
-                Print QR Code & Info
-            </button>
+            {/* ID Card Wrapper */}
+            <div id="printable-area" className="w-full max-w-md print:w-[85.6mm] print:h-[54mm] print:max-w-none print:m-0 print:absolute print:top-1/2 print:left-1/2 print:transform print:-translate-x-1/2 print:-translate-y-1/2">
+                <Card className="relative overflow-hidden border-2 border-primary/20 shadow-xl bg-white print:border-none print:shadow-none print:w-full print:h-full flex flex-col h-[280px] print:h-full">
+                    {/* Header */}
+                    <div className="bg-primary px-6 py-4 print:py-2 print:px-4 text-primary-foreground flex justify-between items-center">
+                        <div>
+                            <h2 className="text-xl font-bold leading-none print:text-sm">Patient Identity Card</h2>
+                            <p className="text-xs opacity-90 mt-1 print:text-[8px]">Shivraj Services</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-[10px] uppercase font-mono opacity-80 print:text-[6px]">ID Number</p>
+                            <p className="font-mono font-bold text-xl leading-none print:text-sm">#{userData.intId}</p>
+                        </div>
+                    </div>
 
-            {/* Responsive adjustments for mobile */}
+                    {/* Body */}
+                    <div className="p-6 print:p-3 flex gap-4 print:gap-2 flex-1 items-center">
+                        {/* Details */}
+                        <div className="flex-1 space-y-3 print:space-y-1">
+                            <div>
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-wider print:text-[6px]">Patient Name</p>
+                                <h3 className="font-bold text-xl text-foreground print:text-lg leading-tight truncate">{userData.name}</h3>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <div>
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider print:text-[6px]">Type</p>
+                                    <p className="font-medium text-sm print:text-[10px] truncate">{userData.type || 'General'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider print:text-[6px]">Mobile</p>
+                                    <p className="font-medium text-sm print:text-[10px] truncate">{userData.phoneNumber}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-1.5 pt-2 print:pt-1">
+                                <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 print:w-3 print:h-3" />
+                                <p className="text-sm text-muted-foreground leading-snug print:text-[9px] line-clamp-2">{userData.city}</p>
+                            </div>
+                        </div>
+
+                        {/* QR Code */}
+                        <div className="flex flex-col items-center justify-center bg-white flex-shrink-0">
+                            <div className="border border-muted p-1 rounded bg-white">
+                                <QRCodeSVG value={url} size={100} className="w-24 h-24 print:w-[22mm] print:h-[22mm]" />
+                            </div>
+                        </div>
+                    </div>
+                </Card>
+            </div>
+
             <style jsx global>{`
-                /* Tailwind is assumed to be present. This is for print media query */
                 @media print {
+                    @page {
+                        size: auto;
+                        margin: 0;
+                    }
                     body {
-                        /* Remove margins from the body for a full-page print */
+                        background-color: white !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    /* Hide everything that is NOT the printable area or its parents */
+                     body > * {
+                        display: none;
+                    }
+                    /* But we can't easily select "parents of #printable-area", so we rely on the component structure */
+                    /* Next.js puts app in a root div usually. We just hide all children of our component wrapper except #printable-area */
+                    
+                    /* The component wrapper will be the only thing visible if we do this workaround: */
+                }
+                
+                /* Since styles are scoped or global, simpler specific print rule: */
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    #printable-area, #printable-area * {
+                        visibility: visible;
+                    }
+                    #printable-area {
+                        position: fixed; /* Fixed to center on page */
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%);
+                        width: 85.6mm;
+                        height: 54mm;
                         margin: 0;
                         padding: 0;
-                    }
-                    /* Hide everything not in the printable area */
-                    body > :not(#printable-area) {
-                        display: none !important;
-                    }
-                    /* Make the printable area visible */
-                    #printable-area {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: auto;
-                        display: flex; /* Ensure it stays flex layout for printing */
-                        flex-direction: row; /* Default desktop layout for print */
-                        padding: 20px;
-                        box-sizing: border-box;
+                        border: 1px dotted #ccc; /* Helper guide for cutting */
                     }
                 }
             `}</style>

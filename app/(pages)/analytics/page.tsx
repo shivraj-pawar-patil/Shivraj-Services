@@ -9,6 +9,10 @@ type User = {
   gender: string;
   type: string;
   date: Date;
+  name: string;
+  intId: number;
+  info: any;
+  phoneNumber: string;
 };
 
 const getGenderCount = (user: User[], condition: string) =>
@@ -41,59 +45,63 @@ const getUserTypeCount = (type: string, users: User[]) =>
  * Helper function to count users registered on the current date.
  */
 const getTodayCount = (users: User[]): number => {
-    const today = moment().startOf('day');
-    return users.filter((user) => moment(user.date).isSame(today, 'day')).length;
+  const today = moment().startOf('day');
+  return users.filter((user) => moment(user.date).isSame(today, 'day')).length;
 };
 
 /**
  * Helper function to count users registered last month.
  */
 const getLastMonthCount = (users: User[]): number => {
-    const lastMonthStart = moment().subtract(1, 'month').startOf('month');
-    const lastMonthEnd = moment().subtract(1, 'month').endOf('month');
-    return users.filter((user) => 
-        moment(user.date).isBetween(lastMonthStart, lastMonthEnd, 'day', '[]')
-    ).length;
+  const lastMonthStart = moment().subtract(1, 'month').startOf('month');
+  const lastMonthEnd = moment().subtract(1, 'month').endOf('month');
+  return users.filter((user) =>
+    moment(user.date).isBetween(lastMonthStart, lastMonthEnd, 'day', '[]')
+  ).length;
 };
 
 
 async function page() {
   const { orgId } = auth();
-  const users: User[] = await prisma?.user.findMany({
+  const users: User[] = (await prisma?.user.findMany({
     select: {
       gender: true,
       type: true,
       date: true,
+      info: true,
+      name: true,
+      intId: true,
+      phoneNumber: true,
     },
     where: {
       orgId: orgId!,
     },
-  });
+  })) ?? [];
 
   const userTypes = users.length
     ? [
-        "Dacryocystitis",
-        "Cataract",
-        "Pterygium",
-        "Spectacles",
-        "Follow-up",
-      ].map((type) => ({
-        type,
-        users: getUserTypeCount(type, users),
-      }))
+      "Dacryocystitis",
+      "Cataract",
+      "Pterygium",
+      "Spectacles",
+      "Follow-up",
+    ].map((type) => ({
+      type,
+      users: getUserTypeCount(type, users),
+    }))
     : [];
 
   const genderdata = users.length
     ? ["male", "female"].map((gender) => ({
-        gender,
-        users: getGenderCount(users, gender),
-      }))
+      gender,
+      users: getGenderCount(users, gender),
+    }))
     : [];
 
   const areaChartData = users.length
     ? Array.from({ length: 12 }, (_, monthIndex) =>
-        getMonthlyData(monthIndex, users)
-      )
+      getMonthlyData(monthIndex, users)
+    )
     : [];
 
   return (
@@ -113,7 +121,7 @@ async function page() {
           <Card className="p-6">
             <div className="space-y-4">
               <Title className="text-foreground">User Type Distribution</Title>
-              
+
               {/* Legend */}
               <div className="flex flex-wrap gap-2">
                 <Badge size="xs" color="rose">
@@ -132,7 +140,7 @@ async function page() {
                   Follow-up
                 </Badge>
               </div>
-              
+
               {/* Chart */}
               <div className="h-64 flex items-center justify-center">
                 <DonutChart
@@ -151,7 +159,7 @@ async function page() {
           <Card className="p-6">
             <div className="space-y-4">
               <Title className="text-foreground">Gender Distribution</Title>
-              
+
               {/* Legend */}
               <div className="flex flex-wrap gap-2">
                 <Badge size="xs" color="rose">
@@ -161,7 +169,7 @@ async function page() {
                   Female
                 </Badge>
               </div>
-              
+
               {/* Chart */}
               <div className="h-64 flex items-center justify-center">
                 <DonutChart
@@ -213,7 +221,7 @@ async function page() {
               <div className="text-sm text-muted-foreground">Last Month</div>
             </div>
           </Card>
-          
+
           <Card className="p-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-foreground">
@@ -222,7 +230,7 @@ async function page() {
               <div className="text-sm text-muted-foreground">This Month</div>
             </div>
           </Card>
-          
+
           <Card className="p-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-foreground">
@@ -231,8 +239,78 @@ async function page() {
               <div className="text-sm text-muted-foreground">Today</div>
             </div>
           </Card>
-          
         </div>
+
+        {/* Upcoming Deliveries Section */}
+        <Card className="p-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Title className="text-foreground">Upcoming Deliveries</Title>
+                <p className="text-sm text-muted-foreground">Patients with delivery dates scheduled for today or tomorrow.</p>
+              </div>
+              <Badge color="orange">Action Required</Badge>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
+                  <tr>
+                    <th className="px-4 py-3 rounded-l-md">ID</th>
+                    <th className="px-4 py-3">Patient Name</th>
+                    <th className="px-4 py-3">Phone</th>
+                    <th className="px-4 py-3">Delivery Date</th>
+                    <th className="px-4 py-3 text-right rounded-r-md">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {users.filter(u => {
+                    if (!u.info?.delevery_date) return false;
+                    const dDate = moment(u.info.delevery_date);
+                    const today = moment().startOf('day');
+                    const tomorrow = moment().add(1, 'day').endOf('day');
+                    return dDate.isBetween(today, tomorrow, 'day', '[]');
+                  }).length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                        No deliveries scheduled for today or tomorrow.
+                      </td>
+                    </tr>
+                  ) : (
+                    users.filter(u => {
+                      if (!u.info?.delevery_date) return false;
+                      const dDate = moment(u.info.delevery_date);
+                      const today = moment().startOf('day');
+                      const tomorrow = moment().add(1, 'day').endOf('day');
+                      return dDate.isBetween(today, tomorrow, 'day', '[]');
+                    }).map((user) => (
+                      <tr key={user.intId} className="hover:bg-muted/30">
+                        <td className="px-4 py-3 font-medium">#{user.intId}</td>
+                        <td className="px-4 py-3 text-foreground">{user.name}</td>
+                        <td className="px-4 py-3">{user.phoneNumber}</td>
+                        <td className="px-4 py-3">
+                          {moment(user.info.delevery_date).calendar(null, {
+                            sameDay: '[Today]',
+                            nextDay: '[Tomorrow]',
+                            nextWeek: 'DD MMM YYYY',
+                            lastDay: '[Yesterday]',
+                            lastWeek: 'DD MMM YYYY',
+                            sameElse: 'DD MMM YYYY'
+                          })}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <Badge size="xs" color={moment(user.info.delevery_date).isSame(moment(), 'day') ? "green" : "yellow"}>
+                            {moment(user.info.delevery_date).isSame(moment(), 'day') ? "Due Today" : "Due Tomorrow"}
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </Card>
       </div>
     </div>
   );

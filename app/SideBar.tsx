@@ -1,9 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { X, Menu } from "lucide-react";
+import { X, LayoutDashboard, Users, LogOut } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { SignOutButton } from "@clerk/nextjs";
 
 interface SideBarProps {
   isOpen: boolean;
@@ -11,134 +16,117 @@ interface SideBarProps {
 }
 
 function SideBar({ isOpen, onToggle }: SideBarProps) {
+  const pathname = usePathname();
+
   const sidebar = [
     {
       path: "/users",
-      name: "User",
-      Image: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="w-6 h-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
-          />
-        </svg>
-      ),
+      name: "Patients",
+      icon: Users,
     },
     {
       path: "/analytics",
       name: "Analytics",
-      Image: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            strokeLinejoin="round"
-            d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"
-          />
-        </svg>
-      ),
+      icon: LayoutDashboard,
     },
   ];
+
   return (
     <>
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={onToggle}
         />
       )}
-      
+
       {/* Sidebar */}
-      <aside className={`
-        fixed lg:static inset-y-0 left-0 z-50
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        w-64 lg:w-fit
-        border-r print:hidden
-      `}>
-        <div className="flex flex-col h-full bg-card border-border theme-transition">
+      <aside className={cn(
+        "fixed lg:static inset-y-0 left-0 z-50",
+        "transform transition-transform duration-300 ease-in-out",
+        isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+        "w-64 border-r bg-card print:hidden flex flex-col justify-between"
+      )}>
+        <div className="flex flex-col h-full bg-card bg-muted/10">
           {/* Mobile Header */}
-          <div className="flex items-center justify-between p-4 lg:hidden border-b">
-            <Image
-              width={12}
-              height={12}
-              className="w-auto h-6"
-              src="https://merakiui.com/images/logo.svg"
-              alt="ShivRaj Services"
-            />
+          <div className="flex items-center justify-between p-4 lg:hidden border-b bg-background">
+            <div className="flex items-center gap-2">
+              <Image
+                width={32}
+                height={32}
+                src="https://merakiui.com/images/logo.svg"
+                alt="Logo"
+              />
+              <span className="font-bold text-lg">ShivRaj</span>
+            </div>
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={onToggle}
               className="lg:hidden"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </Button>
           </div>
 
           {/* Desktop Logo */}
-          <div className="hidden lg:flex items-center justify-center py-8">
+          <div className="hidden lg:flex items-center gap-3 px-6 py-8 border-b border-border/50">
             <Image
-              width={12}
-              height={12}
-              className="w-auto h-6"
+              width={32}
+              height={32}
               src="https://merakiui.com/images/logo.svg"
               alt="ShivRaj Services"
+              className="w-8 h-8"
             />
+            <div className="flex flex-col">
+              <span className="font-bold text-lg leading-none">ShivRaj</span>
+              <span className="text-xs text-muted-foreground">Eye Hospital Services</span>
+            </div>
           </div>
 
           {/* Navigation Items */}
-          <nav className="flex flex-col px-4 lg:px-0 lg:items-center space-y-2 lg:space-y-8 py-4 lg:py-8">
-            {sidebar.map((item) => (
-              <Link
-                key={item.path}
-                href={item.path}
-                onClick={() => {
-                  // Close mobile menu when navigating
-                  if (window.innerWidth < 1024) {
-                    onToggle();
-                  }
-                }}
-                className={`
-                  flex items-center space-x-3 lg:space-x-0
-                  px-3 py-2 lg:pl-6 lg:pr-6 lg:pb-1.5 lg:pt-1.5
-                  text-muted-foreground 
-                  focus:outline-none transition-colors duration-200 
-                  rounded-lg hover:bg-accent hover:text-accent-foreground
-                  w-full lg:w-auto
-                `}
-              >
-                <span className="flex-shrink-0">{item.Image}</span>
-                <span className="lg:hidden text-sm font-medium">{item.name}</span>
-              </Link>
-            ))}
+          <nav className="flex-1 px-4 py-6 space-y-2">
+            {sidebar.map((item) => {
+              const isActive = pathname.startsWith(item.path);
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  onClick={() => {
+                    if (window.innerWidth < 1024) {
+                      onToggle();
+                    }
+                  }}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group",
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  <Icon className={cn("w-5 h-5", isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground")} />
+                  <span className="font-medium">{item.name}</span>
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Mobile Theme Toggle */}
-          <div className="px-4 py-2 lg:hidden border-t">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Theme</span>
+          {/* Footer Actions */}
+          <div className="p-4 border-t border-border/50 space-y-4 bg-background/50">
+            <div className="flex items-center justify-between px-2">
+              <span className="text-sm font-medium text-muted-foreground">Theme</span>
               <ThemeToggle />
+            </div>
+            <div className="pt-2">
+              <SignOutButton>
+                <Button variant="outline" className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </Button>
+              </SignOutButton>
             </div>
           </div>
         </div>

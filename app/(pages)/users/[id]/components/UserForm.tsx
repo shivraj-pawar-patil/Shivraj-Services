@@ -20,12 +20,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { User } from "@prisma/client";
 import { TUserSchema, userSchema } from "@/lib/type";
-import { createUser, updateUser } from "@/server/user";
+import { createUser, updateUser, searchUsers } from "@/server/user";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
+import { User as UserIcon, Phone, MapPin, Stethoscope, Tent, Users as UsersIcon } from "lucide-react";
 
 interface Users extends User {
   info: any;
@@ -42,22 +50,25 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
     resolver: zodResolver(userSchema),
     defaultValues: user
       ? {
-          name: user.name ?? "",
-          gender: user.gender ?? "",
-          location: user.city ?? "",
-          phone_no: user.phoneNumber ?? "",
-          type: user.type ?? "",
-          from_camp: user.from_camp ?? false,
-        }
+        name: user.name ?? "",
+        gender: user.gender ?? "",
+        location: user.city ?? "",
+        phone_no: user.phoneNumber ?? "",
+        type: user.type ?? "",
+        from_camp: user.from_camp ?? false,
+      }
       : {
-          name: "",
-          gender: "",
-          location: "",
-          phone_no: "",
-          type: "",
-          from_camp: false,
-        },
+        name: "",
+        gender: "",
+        location: "",
+        phone_no: "",
+        type: "",
+        from_camp: false,
+      },
   });
+
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async (data: TUserSchema) => {
     try {
@@ -102,27 +113,74 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                   {user ? "Update user information" : "Enter user details to create a new user"}
                 </p>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-4 md:gap-6">
                 <FormField
                   name="name"
                   control={form.control}
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground font-medium">Name</FormLabel>
+                    <FormItem className="relative">
+                      <FormLabel>Name</FormLabel>
                       <FormControl>
-                        <Input
-                          disabled={isLoading}
-                          placeholder="Enter your name"
-                          className="w-full"
-                          {...field}
-                        />
+                        <div className="relative">
+                          <UserIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            disabled={isLoading}
+                            placeholder="Enter name"
+                            className="pl-9"
+                            {...field}
+                            onChange={async (e) => {
+                              field.onChange(e);
+                              const value = e.target.value;
+                              if (value.length > 2) {
+                                const results = await searchUsers(value, orgId);
+                                // Filter out current user if editing
+                                const filtered = user
+                                  ? results.filter((u: any) => u.id !== user.id)
+                                  : results;
+                                setSuggestions(filtered);
+                                setShowSuggestions(true);
+                              } else {
+                                setSuggestions([]);
+                                setShowSuggestions(false);
+                              }
+                            }}
+                            onBlur={() => {
+                              // Small delay to allow clicking suggestions
+                              setTimeout(() => setShowSuggestions(false), 200);
+                            }}
+                          />
+                        </div>
                       </FormControl>
+                      {showSuggestions && suggestions.length > 0 && (
+                        <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground rounded-md border shadow-md">
+                          <div className="p-1">
+                            <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                              Similar Patients Found:
+                            </p>
+                            {suggestions.map((suggestion) => (
+                              <div
+                                key={suggestion.id}
+                                className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                onClick={() => router.push(`/users/${suggestion.intId}/info`)}
+                              >
+                                <UserIcon className="mr-2 h-4 w-4" />
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{suggestion.name}</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {suggestion.phoneNumber} • {suggestion.city}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   name="gender"
                   control={form.control}
@@ -227,23 +285,32 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
-                      <FormMessage /> 
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={isLoading}
                     className="w-full sm:w-auto"
                   >
                     {isLoading ? "Processing..." : (user ? "Update Patient" : "Create Patient")}
                   </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={isLoading}
+                    className="w-full sm:w-auto"
+                    onClick={() => router.push("/users")}
+                  >
+                    Cancel
+                  </Button>
                 </div>
-            </div>
-          </form>
-        </Form>
+              </div>
+            </form>
+          </Form>
         </div>
       </div>
     </Suspense>
