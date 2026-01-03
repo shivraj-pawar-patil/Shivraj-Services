@@ -74,6 +74,7 @@ export type User = {
   info: any;
   date: Date | string;
   type?: string;
+  updatedAt?: Date | string;
 };
 
 export default function DataTableDemo({ users }: { users: User[] }) {
@@ -203,7 +204,14 @@ export default function DataTableDemo({ users }: { users: User[] }) {
 
   // ✅ Filter by calendar date only
   const filteredUsers = React.useMemo(() => {
-    let data = [...users].sort((a, b) => b.intId - a.intId);
+    let data = [...users].sort((a, b) => {
+      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      if (dateB !== dateA) {
+        return dateB - dateA;
+      }
+      return b.intId - a.intId;
+    });
 
     if (selectedDate) {
       data = data.filter((user) =>

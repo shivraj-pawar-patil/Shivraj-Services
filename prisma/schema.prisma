@@ -24,4 +24,5 @@ model User {
   type      String   @default("Follow-up")
   date      DateTime @default(now())
   info      Json?
+  updatedAt DateTime @updatedAt @default(now())
 }

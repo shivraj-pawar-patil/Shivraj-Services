@@ -45,6 +45,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { History } from "lucide-react";
 
 function InfoForm({ user, orgId }: UserFormProps) {
   const router = useRouter();
@@ -129,7 +138,88 @@ function InfoForm({ user, orgId }: UserFormProps) {
                   Manage patient details, prescription, and billing information.
                 </p>
               </div>
-              <div className="flex gap-2 w-full md:w-auto">
+              <div className="flex gap-2 w-full md:w-auto items-center">
+                {/* History Modal */}
+                {user?.info?.history && (Array.isArray(user.info.history) && user.info.history.length > 0) && (
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button variant="outline" size="icon" title="View History">
+                        <History className="h-4 w-4" />
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent className="overflow-y-auto">
+                      <SheetHeader>
+                        <SheetTitle>Patient History</SheetTitle>
+                        <SheetDescription>
+                          Previous versions of patient information.
+                        </SheetDescription>
+                      </SheetHeader>
+                      <div className="mt-4 space-y-4">
+                        {[...user.info.history].reverse().map((record: any, idx: number) => (
+                          <Card key={idx}>
+                            <CardHeader className="p-4">
+                              <CardTitle className="text-sm font-medium">
+                                {record.updatedAt ? format(new Date(record.updatedAt), "PPP p") : "Unknown Date"}
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4 pt-0 text-sm space-y-2">
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <span className="font-semibold text-muted-foreground">Total:</span> ₹{record.totalAmount}
+                                </div>
+                                <div>
+                                  <span className="font-semibold text-muted-foreground">Balance:</span> ₹{record.balance}
+                                </div>
+                                <div>
+                                  <span className="font-semibold text-muted-foreground">Glass:</span> {record.glass_type}
+                                </div>
+                              </div>
+                              <div className="mt-4 border-t pt-4">
+                                <h4 className="font-semibold text-sm mb-2 text-center">Right Eye (OD)</h4>
+                                <div className="grid grid-cols-5 gap-1 text-xs text-center font-medium text-muted-foreground mb-1">
+                                  <span></span><span>SPH</span><span>CYL</span><span>AXIS</span><span>VIS</span>
+                                </div>
+                                <div className="grid grid-cols-5 gap-1 text-xs text-center items-center mb-1">
+                                  <span className="text-muted-foreground font-medium">Dist</span>
+                                  <div className="bg-muted/50 p-1 rounded">{record.rSPHu || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.rCYLu || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.rAXISu || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.rVISIONu || "-"}</div>
+                                </div>
+                                <div className="grid grid-cols-5 gap-1 text-xs text-center items-center">
+                                  <span className="text-muted-foreground font-medium">Near</span>
+                                  <div className="bg-muted/50 p-1 rounded">{record.rSPHb || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.rCYLb || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.rAXISb || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.rVISIONb || "-"}</div>
+                                </div>
+
+                                <h4 className="font-semibold text-sm mt-4 mb-2 text-center">Left Eye (OS)</h4>
+                                <div className="grid grid-cols-5 gap-1 text-xs text-center font-medium text-muted-foreground mb-1">
+                                  <span></span><span>SPH</span><span>CYL</span><span>AXIS</span><span>VIS</span>
+                                </div>
+                                <div className="grid grid-cols-5 gap-1 text-xs text-center items-center mb-1">
+                                  <span className="text-muted-foreground font-medium">Dist</span>
+                                  <div className="bg-muted/50 p-1 rounded">{record.lSPHu || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.lCYLu || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.lAXISu || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.lVISIONu || "-"}</div>
+                                </div>
+                                <div className="grid grid-cols-5 gap-1 text-xs text-center items-center">
+                                  <span className="text-muted-foreground font-medium">Near</span>
+                                  <div className="bg-muted/50 p-1 rounded">{record.lSPHb || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.lCYLb || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.lAXISb || "-"}</div>
+                                  <div className="bg-muted/50 p-1 rounded">{record.lVISIONb || "-"}</div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                )}
                 <Link href={"/users"} className="w-full md:w-auto">
                   <Button variant="outline" className="w-full">
                     Cancel

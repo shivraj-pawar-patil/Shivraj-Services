@@ -66,6 +66,22 @@ export async function updateUserInfo(form: TUserInfoSchema, id: string) {
     delevery_date
   } = form;
 
+  const existingUser = await prisma.user.findUnique({
+    where: { id },
+    select: { info: true }
+  });
+
+  const oldInfo = (existingUser?.info as any) || {};
+  const { history: oldHistory, ...infoSnapshot } = oldInfo;
+
+  const history = [
+    ...(Array.isArray(oldHistory) ? oldHistory : []),
+    {
+      ...infoSnapshot,
+      updatedAt: new Date().toISOString()
+    }
+  ].filter(entry => Object.keys(entry).length > 1); // Filter out empty initial states if needed
+
   await prisma.user.update({
     data: {
       name,
@@ -94,6 +110,7 @@ export async function updateUserInfo(form: TUserInfoSchema, id: string) {
         lCYLb,
         lAXISb,
         lVISIONb,
+        history,
       },
     },
     where: {
