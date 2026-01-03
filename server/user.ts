@@ -68,7 +68,7 @@ export async function updateUserInfo(form: TUserInfoSchema, id: string) {
 
   const existingUser = await prisma.user.findUnique({
     where: { id },
-    select: { info: true }
+    select: { info: true, intId: true }
   });
 
   const oldInfo = (existingUser?.info as any) || {};
@@ -118,6 +118,10 @@ export async function updateUserInfo(form: TUserInfoSchema, id: string) {
     },
   });
   revalidatePath("/users");
+  if (existingUser?.intId) {
+    revalidatePath(`/users/${existingUser.intId}`);
+    revalidatePath(`/users/${existingUser.intId}/info`);
+  }
 }
 
 export async function deleteUser(Ids: string[]) {
