@@ -3,8 +3,20 @@ import { Navbar } from "@/components/Navbar"
 import SideBar from "../SideBar"
 import { useMobileMenu } from "@/hooks/useMobileMenu"
 
+import { usePathname } from "next/navigation"
+
 const DefaultLayout = ({ children }: { children: React.ReactNode }) => {
   const { isOpen, toggle, close } = useMobileMenu()
+  const pathname = usePathname()
+  const isLandingPage = pathname === "/"
+
+  if (isLandingPage) {
+    return (
+      <main className="min-h-screen bg-background">
+        {children}
+      </main>
+    )
+  }
 
   return (
     <div className="flex h-[100dvh] overflow-hidden bg-background text-foreground">

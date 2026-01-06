@@ -6,9 +6,9 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { X, LayoutDashboard, Users, LogOut } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { SignOutButton } from "@clerk/nextjs";
+import { useClerk } from "@clerk/nextjs";
 
 interface SideBarProps {
   isOpen: boolean;
@@ -17,6 +17,8 @@ interface SideBarProps {
 
 function SideBar({ isOpen, onToggle }: SideBarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { signOut } = useClerk();
 
   const sidebar = [
     {
@@ -58,7 +60,7 @@ function SideBar({ isOpen, onToggle }: SideBarProps) {
                 src="https://merakiui.com/images/logo.svg"
                 alt="Logo"
               />
-              <span className="font-bold text-lg">ShivRaj</span>
+              <span className="font-bold text-lg">Eye Optical Services</span>
             </div>
             <Button
               variant="ghost"
@@ -76,12 +78,12 @@ function SideBar({ isOpen, onToggle }: SideBarProps) {
               width={32}
               height={32}
               src="https://merakiui.com/images/logo.svg"
-              alt="ShivRaj Services"
+              alt="Eye Optical Services"
               className="w-8 h-8"
             />
             <div className="flex flex-col">
-              <span className="font-bold text-lg leading-none">ShivRaj</span>
-              <span className="text-xs text-muted-foreground">Eye Hospital Services</span>
+              <span className="font-bold text-lg leading-none">Eye Optical Services</span>
+              <span className="text-xs text-muted-foreground">Practice Management</span>
             </div>
           </div>
 
@@ -121,12 +123,14 @@ function SideBar({ isOpen, onToggle }: SideBarProps) {
               <ThemeToggle />
             </div>
             <div className="pt-2">
-              <SignOutButton>
-                <Button variant="outline" className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10">
-                  <LogOut className="w-4 h-4" />
-                  <span>Sign Out</span>
-                </Button>
-              </SignOutButton>
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                onClick={() => signOut(() => router.push("/"))}
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </Button>
             </div>
           </div>
         </div>

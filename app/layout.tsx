@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Eye Optical",
-  description: "We provode a on demand services",
+  title: "Eye Optical Services",
+  description: "Premium optical services and patient management platform",
 };
 
 export default function RootLayout({

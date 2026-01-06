@@ -51,7 +51,7 @@ const UserQRCodeClient = ({ userId, userData, baseUrl }: UserQRCodeClientProps) 
                     <div className="bg-primary px-6 py-4 print:py-2 print:px-4 text-primary-foreground flex justify-between items-center">
                         <div>
                             <h2 className="text-xl font-bold leading-none print:text-sm">Patient Identity Card</h2>
-                            <p className="text-xs opacity-90 mt-1 print:text-[8px]">Shivraj Services</p>
+                            <p className="text-xs opacity-90 mt-1 print:text-[8px]">Eye Optical Services</p>
                         </div>
                         <div className="text-right">
                             <p className="text-[10px] uppercase font-mono opacity-80 print:text-[6px]">ID Number</p>

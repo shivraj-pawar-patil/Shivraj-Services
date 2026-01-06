@@ -1,5 +1,5 @@
 import { UserButton, OrganizationSwitcher } from "@clerk/nextjs";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 
@@ -22,16 +22,23 @@ export const Navbar = ({ onMenuToggle }: NavbarProps) => {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            
+
             <h1 className="text-lg sm:text-xl font-semibold text-foreground">Eye Optical Services</h1>
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="hidden sm:block">
-              <ThemeToggle />
-            </div>
+
             <div className="hidden md:block">
-              <OrganizationSwitcher hidePersonal={true} />
+              <OrganizationSwitcher
+                hidePersonal={true}
+                appearance={{
+                  elements: {
+                    organizationSwitcherTrigger: "text-foreground hover:text-primary",
+                    organizationPreviewTextContainer: "text-foreground",
+                    organizationPreviewMainIdentifier: "text-foreground"
+                  }
+                }}
+              />
             </div>
             <div className="flex items-center">
               <UserButton afterSignOutUrl="/" />
