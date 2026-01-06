@@ -75,7 +75,7 @@ export default async function Home() {
                 </div>
                 <CardTitle>Clinical Analytics</CardTitle>
                 <CardDescription>
-                  Gain actionable insights into your practice's performance with real-time data visualization.
+                  Gain actionable insights into your practice&apos;s performance with real-time data visualization.
                 </CardDescription>
               </CardHeader>
               <CardContent>
