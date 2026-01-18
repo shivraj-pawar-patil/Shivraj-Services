@@ -36,6 +36,12 @@ export default function RootLayout({
             {children}
             <Toaster />
           </ThemeProvider>
+          <script
+            defer
+            data-website-id="8f308623-11b7-43de-b0c2-263a1bd3f399"
+            data-endpoint="https://open-analytic.vercel.app/api/send"
+            src="https://open-analytic.vercel.app/tracker.js"
+          ></script>
         </body>
       </html>
     </ClerkProvider>
