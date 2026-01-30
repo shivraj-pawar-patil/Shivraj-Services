@@ -53,7 +53,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { History } from "lucide-react";
+
 
 function InfoForm({ user, orgId }: UserFormProps) {
   const router = useRouter();
@@ -143,8 +143,16 @@ function InfoForm({ user, orgId }: UserFormProps) {
                 {user?.info?.history && (Array.isArray(user.info.history) && user.info.history.length > 0) && (
                   <Sheet>
                     <SheetTrigger asChild>
-                      <Button variant="outline" size="icon" title="View History">
-                        <History className="h-4 w-4" />
+                      <Button variant="outline" title="View History">
+                        {(() => {
+                          const count = (user.info.history?.length || 0) + 1;
+                          const suffix = ["th", "st", "nd", "rd"];
+                          const v = count % 100;
+                          return `${count}${suffix[(v - 20) % 10] ||
+                            suffix[v] ||
+                            suffix[0]
+                            } Visit`;
+                        })()}
                       </Button>
                     </SheetTrigger>
                     <SheetContent className="overflow-y-auto">

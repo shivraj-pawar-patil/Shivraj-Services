@@ -51,6 +51,7 @@ import { MoreHorizontal } from "lucide-react";
 
 // ⬇️ NEW imports for calendar
 import { Calendar } from "@/components/ui/calendar";
+import { Badge } from "@/components/ui/badge";
 import {
   Popover,
   PopoverContent,
@@ -117,17 +118,108 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     {
       accessorKey: "name",
       header: "Name",
-      cell: ({ row }) => <div>{row.getValue("name")}</div>,
+      cell: ({ row }) => (
+        <Link
+          href={`/users/${row.original.intId}/info`}
+          className="font-medium hover:underline text-primary"
+        >
+          {row.getValue("name")}
+        </Link>
+      ),
     },
     {
       accessorKey: "type",
       header: "Type",
-      cell: ({ row }) => <div>{row.getValue("type")}</div>,
+      cell: ({ row }) => {
+        const type = row.getValue("type") as string;
+        return (
+          <Badge variant={type === "Follow-up" ? "secondary" : "default"}>
+            {type}
+          </Badge>
+        );
+      },
+    },
+    {
+      id: "visit",
+      header: "Visit",
+      cell: ({ row }) => {
+        const info = row.original.info as any;
+        const history = info?.history || [];
+        const count = history.length + 1;
+        const suffix = ["th", "st", "nd", "rd"];
+        const v = count % 100;
+        const label = `${count
+          }${suffix[(v - 20) % 10] || suffix[v] || suffix[0]} Visit`;
+
+        if (count === 1) {
+          return <Badge variant="outline">{label}</Badge>;
+        }
+
+        return (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Badge
+                variant="outline"
+                className="cursor-pointer hover:bg-muted"
+              >
+                {label} (View History)
+              </Badge>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="space-y-4">
+                <h4 className="font-medium leading-none">Visit History</h4>
+                <div className="grid gap-4 max-h-[300px] overflow-y-auto">
+                  {history
+                    .slice()
+                    .reverse()
+                    .map((record: any, index: number) => (
+                      <div
+                        key={index}
+                        className="flex flex-col gap-1 border-b pb-2 last:border-0"
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium">
+                            {record.updatedAt
+                              ? moment(record.updatedAt).format("DD MMM YYYY")
+                              : "Unknown Date"}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            Visit {history.length - index}
+                          </span>
+                        </div>
+                        <div className="text-xs text-muted-foreground grid grid-cols-2 gap-2">
+                          <span>Glass: {record.glass_type || "-"}</span>
+                          <span>
+                            Total: ₹{record.totalAmount || "0"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        );
+      },
     },
     {
       accessorKey: "gender",
       header: "Gender",
-      cell: ({ row }) => <div>{row.getValue("gender")}</div>,
+      cell: ({ row }) => {
+        const gender = row.getValue("gender") as string;
+        return (
+          <Badge
+            variant="outline"
+            className={
+              gender === "male"
+                ? "border-blue-200 text-blue-700 bg-blue-50"
+                : "border-pink-200 text-pink-700 bg-pink-50"
+            }
+          >
+            {gender}
+          </Badge>
+        );
+      },
     },
     {
       accessorKey: "city",
@@ -137,13 +229,22 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     {
       accessorKey: "phoneNumber",
       header: () => <div>Phone Number</div>,
-      cell: ({ row }) => <div>{row.getValue("phoneNumber")}</div>,
+      cell: ({ row }) => (
+        <a
+          href={`tel:${row.getValue("phoneNumber")}`}
+          className="hover:underline text-muted-foreground"
+        >
+          {row.getValue("phoneNumber")}
+        </a>
+      ),
     },
     {
       accessorKey: "from_camp",
       header: () => <div>From Camp</div>,
       cell: ({ row }) => (
-        <div>{row.getValue("from_camp") ? "Yes" : "No"}</div>
+        <Badge variant={row.getValue("from_camp") ? "default" : "secondary"}>
+          {row.getValue("from_camp") ? "Camp" : "Direct"}
+        </Badge>
       ),
     },
     {
@@ -152,7 +253,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       cell: ({ row }) => {
         const date = row.getValue("updatedAt");
         return (
-          <div>
+          <div className="text-muted-foreground text-sm">
             {date ? moment(date).format("DD MMM YYYY, h:mm a") : "-"}
           </div>
         );
