@@ -94,85 +94,76 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
   };
 
   return (
-    <Suspense fallback="<div>Loading</div>">
-      <div
-        className="min-h-screen bg-background p-4 md:p-8 lg:p-16"
-        suppressHydrationWarning
-      >
-        <div className="max-w-3xl mx-auto">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-6 md:space-y-8 pb-10"
-            >
-              <div className="space-y-2">
-                <h3 className="text-xl md:text-2xl font-semibold text-foreground">
-                  {user ? "Edit Patient" : "Create New Patient"}
-                </h3>
-                <p className="text-muted-foreground">
-                  {user ? "Update user information" : "Enter user details to create a new user"}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:gap-6">
+    <Suspense fallback="<div>Loading...</div>">
+      <div className="min-h-screen bg-muted/20 flex items-center justify-center p-4 md:p-8" suppressHydrationWarning>
+        <Card className="w-full max-w-2xl shadow-lg">
+          <CardHeader>
+            <CardTitle>{user ? "Edit Patient" : "Register New Patient"}</CardTitle>
+            <CardDescription>
+              {user
+                ? "Update the patient's personal information."
+                : "Fill in the details below to create a new patient record."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Name Field with Search */}
                 <FormField
                   name="name"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="relative">
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>Full Name</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <UserIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <UserIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                           <Input
                             disabled={isLoading}
-                            placeholder="Enter name"
+                            placeholder="e.g. Anand Kumar"
                             className="pl-9"
                             autoComplete="off"
                             {...field}
                             onChange={async (e) => {
                               field.onChange(e);
                               const value = e.target.value;
-                              if (value.length > 2) {
+                              if (value.length > 2 && !user) {
                                 const results = await searchUsers(value, orgId);
-                                // Filter out current user if editing
-                                const filtered = user
-                                  ? results.filter((u: any) => u.id !== user.id)
-                                  : results;
-                                setSuggestions(filtered);
+                                setSuggestions(results);
                                 setShowSuggestions(true);
                               } else {
                                 setSuggestions([]);
                                 setShowSuggestions(false);
                               }
                             }}
-                            onBlur={() => {
-                              // Small delay to allow clicking suggestions
-                              setTimeout(() => setShowSuggestions(false), 200);
-                            }}
+                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                           />
                         </div>
                       </FormControl>
                       {showSuggestions && suggestions.length > 0 && (
-                        <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground rounded-md border shadow-md">
-                          <div className="p-1">
-                            <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                              Similar Patients Found:
+                        <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground rounded-md border shadow-md overflow-hidden">
+                          <div className="p-2 bg-muted/50 border-b">
+                            <p className="text-xs font-semibold text-muted-foreground">
+                              Similar Patients Found ({suggestions.length})
                             </p>
+                          </div>
+                          <div className="max-h-[200px] overflow-y-auto p-1">
                             {suggestions.map((suggestion) => (
                               <div
                                 key={suggestion.id}
-                                className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 text-sm hover:bg-accent transition-colors"
                                 onMouseDown={(e) => {
-                                  e.preventDefault(); // Prevent input blur
+                                  e.preventDefault();
                                   router.push(`/users/${suggestion.intId}/info`);
                                 }}
                               >
-                                <UserIcon className="mr-2 h-4 w-4" />
-                                <div className="flex flex-col">
-                                  <span className="font-medium">{suggestion.name}</span>
-                                  <span className="text-xs text-muted-foreground">
-                                    {suggestion.phoneNumber} • {suggestion.city}
+                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <UserIcon className="h-4 w-4 text-primary" />
+                                </div>
+                                <div className="flex flex-col flex-1 overflow-hidden">
+                                  <span className="font-medium truncate">{suggestion.name}</span>
+                                  <span className="text-xs text-muted-foreground truncate">
+                                    {suggestion.city} • {suggestion.phoneNumber}
                                   </span>
                                 </div>
                               </div>
@@ -185,137 +176,149 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                   )}
                 />
 
-                <FormField
-                  name="gender"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground font-medium">Gender</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={isLoading}
-                          placeholder="Enter your gender"
-                          className="w-full"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  name="location"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground font-medium">Location</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={isLoading}
-                          placeholder="City, Country"
-                          className="w-full"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  name="phone_no"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground font-medium">Phone Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="tel"
-                          disabled={isLoading}
-                          placeholder="Enter phone number"
-                          className="w-full"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground font-medium">Patient Type</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Phone Number */}
+                  <FormField
+                    name="phone_no"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Type Of Patient" />
-                          </SelectTrigger>
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              type="tel"
+                              maxLength={10}
+                              disabled={isLoading}
+                              placeholder="9876543210"
+                              className="pl-9"
+                              {...field}
+                            />
+                          </div>
                         </FormControl>
-                        <SelectContent>
-                          {[
-                            "Dacryocystitis",
-                            "Cataract",
-                            "Pterygium",
-                            "Spectacles",
-                            "Follow-up",
-                          ].map((_) => (
-                            <SelectItem key={_} value={_}>
-                              {_}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
+                  {/* Gender Select */}
+                  <FormField
+                    name="gender"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gender</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Gender" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="male">Male</SelectItem>
+                            <SelectItem value="female">Female</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Location */}
+                  <FormField
+                    name="location"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>City / Location</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              disabled={isLoading}
+                              placeholder="e.g. Mumbai"
+                              className="pl-9"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Patient Type */}
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Patient Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Category" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Dacryocystitis">Dacryocystitis</SelectItem>
+                            <SelectItem value="Cataract">Cataract</SelectItem>
+                            <SelectItem value="Pterygium">Pterygium</SelectItem>
+                            <SelectItem value="Spectacles">Spectacles</SelectItem>
+                            <SelectItem value="Follow-up">Follow-up</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* From Camp Checkbox */}
                 <FormField
                   control={form.control}
                   name="from_camp"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground font-medium">From Camp</FormLabel>
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                       <FormControl>
                         <Checkbox
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          Registered via Medical Camp?
+                        </FormLabel>
+                        <p className="text-sm text-muted-foreground">
+                          Check this if the patient was acquired through an outreach camp.
+                        </p>
+                      </div>
                     </FormItem>
                   )}
                 />
 
-                <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full sm:w-auto"
-                  >
-                    {isLoading ? "Processing..." : (user ? "Update Patient" : "Create Patient")}
+                <div className="flex gap-4 pt-4">
+                  <Button type="submit" disabled={isLoading} className="w-full">
+                    {isLoading ? "Saving..." : (user ? "Update Patient Record" : "Create Patient Record")}
                   </Button>
                   <Button
                     type="button"
-                    variant="secondary"
+                    variant="outline"
                     disabled={isLoading}
-                    className="w-full sm:w-auto"
+                    className="w-full"
                     onClick={() => router.push("/users")}
                   >
                     Cancel
                   </Button>
                 </div>
-              </div>
-            </form>
-          </Form>
-        </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       </div>
     </Suspense>
   );
