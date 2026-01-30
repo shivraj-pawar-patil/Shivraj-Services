@@ -160,7 +160,9 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             <PopoverTrigger asChild>
               <Badge
                 variant="outline"
-                className="cursor-pointer hover:bg-muted"
+                role="button"
+                tabIndex={0}
+                className="cursor-pointer hover:bg-muted active:scale-95 transition-transform"
               >
                 {label} (View History)
               </Badge>
