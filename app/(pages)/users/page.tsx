@@ -2,7 +2,7 @@ import React from "react";
 import prisma from "@/lib/prisma";
 import DataTableDemo, { User } from "./[id]/components/Users";
 import { auth } from "@clerk/nextjs";
- async function  page() {
+async function page() {
   const { orgId } = auth()
   const users = await prisma.user.findMany({
     select: {
@@ -16,6 +16,7 @@ import { auth } from "@clerk/nextjs";
       info: true,
       from_camp: true,
       date: true,
+      updatedAt: true,
     },
     where: {
       orgId: orgId!

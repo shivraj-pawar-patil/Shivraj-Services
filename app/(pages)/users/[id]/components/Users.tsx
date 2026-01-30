@@ -147,6 +147,18 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       ),
     },
     {
+      accessorKey: "updatedAt",
+      header: "Updated At",
+      cell: ({ row }) => {
+        const date = row.getValue("updatedAt");
+        return (
+          <div>
+            {date ? moment(date).format("DD MMM YYYY, h:mm a") : "-"}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "id",
       header: "Action",
       cell: ({ row }) => {
@@ -214,8 +226,11 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     });
 
     if (selectedDate) {
-      data = data.filter((user) =>
-        moment(user.date).isSame(moment(selectedDate), "day")
+      data = data.filter(
+        (user) =>
+          moment(user.date).isSame(moment(selectedDate), "day") ||
+          (user.updatedAt &&
+            moment(user.updatedAt).isSame(moment(selectedDate), "day"))
       );
     }
 
