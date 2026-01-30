@@ -26,13 +26,7 @@ import { User } from "@prisma/client";
 import { TUserSchema, userSchema } from "@/lib/type";
 import { createUser, updateUser, searchUsers } from "@/server/user";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
+
 import { User as UserIcon, Phone, MapPin, Stethoscope, Tent, Users as UsersIcon } from "lucide-react";
 
 interface Users extends User {
@@ -95,20 +89,20 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
 
   return (
     <Suspense fallback="<div>Loading...</div>">
-      <div className="min-h-screen bg-muted/20 flex items-center justify-center p-4 md:p-8" suppressHydrationWarning>
-        <Card className="w-full max-w-2xl shadow-lg">
-          <CardHeader>
-            <CardTitle>{user ? "Edit Patient" : "Register New Patient"}</CardTitle>
-            <CardDescription>
+      <div className="min-h-screen bg-muted/20 flex flex-col items-center " suppressHydrationWarning>
+        <div className="w-full max-w-3xl space-y-6">
+          <div className="space-y-1 text-center sm:text-left">
+            <h2 className="text-2xl font-bold tracking-tight">{user ? "Edit Patient" : "Register New Patient"}</h2>
+            <p className="text-muted-foreground">
               {user
                 ? "Update the patient's personal information."
                 : "Fill in the details below to create a new patient record."}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            </p>
+          </div>
+          <div className="bg-background rounded-lg border shadow-sm p-6 md:p-8">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {/* Name Field with Search */}
+                {/* Name Field */}
                 <FormField
                   name="name"
                   control={form.control}
@@ -202,7 +196,7 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                     )}
                   />
 
-                  {/* Gender Select */}
+                  {/* Gender */}
                   <FormField
                     name="gender"
                     control={form.control}
@@ -277,7 +271,7 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                   />
                 </div>
 
-                {/* From Camp Checkbox */}
+                {/* From Camp */}
                 <FormField
                   control={form.control}
                   name="from_camp"
@@ -301,7 +295,7 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                   )}
                 />
 
-                <div className="flex gap-4 pt-4">
+                <div className="flex gap-4 pt-2">
                   <Button type="submit" disabled={isLoading} className="w-full">
                     {isLoading ? "Saving..." : (user ? "Update Patient Record" : "Create Patient Record")}
                   </Button>
@@ -317,8 +311,8 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                 </div>
               </form>
             </Form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </Suspense>
   );

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { X, LayoutDashboard, Users, LogOut } from "lucide-react";
+import { X, LayoutDashboard, Users, LogOut, Calendar } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,11 @@ function SideBar({ isOpen, onToggle }: SideBarProps) {
       path: "/analytics",
       name: "Analytics",
       icon: LayoutDashboard,
+    },
+    {
+      path: "/calendar",
+      name: "Calendar",
+      icon: Calendar,
     },
   ];
 
