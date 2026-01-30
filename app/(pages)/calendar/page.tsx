@@ -1,16 +1,15 @@
-import { currentUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { getCalendarEvents } from "@/server/calendar";
 import CalendarClient from "./components/CalendarClient";
 
 export default async function CalendarPage() {
-    const user = await currentUser();
+    const { orgId } = auth();
 
-    if (!user) {
+    if (!orgId) {
         redirect("/");
     }
 
-    const orgId = user.id; // Using user ID as org ID for now based on existing patterns
     const events = await getCalendarEvents(orgId);
 
     return (
