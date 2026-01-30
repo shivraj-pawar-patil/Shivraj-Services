@@ -117,7 +117,22 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     },
     {
       accessorKey: "name",
-      header: "Name",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="-ml-4"
+          >
+            Name
+            {column.getIsSorted() === "asc" ? (
+              <span className="ml-2">↑</span>
+            ) : column.getIsSorted() === "desc" ? (
+              <span className="ml-2">↓</span>
+            ) : null}
+          </Button>
+        );
+      },
       cell: ({ row }) => (
         <Link
           href={`/users/${row.original.intId}/info`}
@@ -251,7 +266,22 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     },
     {
       accessorKey: "updatedAt",
-      header: "Updated At",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="-ml-4"
+          >
+            Updated At
+            {column.getIsSorted() === "asc" ? (
+              <span className="ml-2">↑</span>
+            ) : column.getIsSorted() === "desc" ? (
+              <span className="ml-2">↓</span>
+            ) : null}
+          </Button>
+        );
+      },
       cell: ({ row }) => {
         const date = row.getValue("updatedAt");
         return (
@@ -364,7 +394,12 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       <div className="space-y-4">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <h1 className="text-2xl font-bold text-foreground">Patients</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-foreground">Patients</h1>
+            <Badge variant="secondary" className="text-sm">
+              {table.getFilteredRowModel().rows.length}
+            </Badge>
+          </div>
           <div className="flex items-center gap-2 ml-auto">
             <Link href="/users/create-user">
               <Button size="sm" className="w-full sm:w-auto">
@@ -481,6 +516,22 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Reset Filters */}
+            {(type || selectedDate || table.getState().columnFilters.length > 0) && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setType("");
+                  setSelectedDate(undefined);
+                  table.resetColumnFilters();
+                }}
+                className="px-2 lg:px-3"
+              >
+                Reset
+                <span className="sr-only">Reset Filters</span>
+              </Button>
+            )}
           </div>
 
           {/* Column Visibility & Delete */}
@@ -575,7 +626,15 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
+                      <div className="mb-2 rounded-full bg-muted p-4">
+                        <MoreHorizontal className="h-6 w-6 opacity-20" />
+                      </div>
+                      <p className="text-lg font-medium">No results found.</p>
+                      <p className="text-sm">
+                        Try adjusting your filters or search query.
+                      </p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
@@ -586,8 +645,26 @@ export default function DataTableDemo({ users }: { users: User[] }) {
         {/* Pagination */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
           <div className="text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+            {table.getFilteredSelectedRowModel().rows.length > 0 ? (
+              <span>
+                {table.getFilteredSelectedRowModel().rows.length} of{" "}
+                {table.getFilteredRowModel().rows.length} row(s) selected.
+              </span>
+            ) : (
+              <span>
+                Showing{" "}
+                {table.getState().pagination.pageIndex *
+                  table.getState().pagination.pageSize +
+                  1}{" "}
+                to{" "}
+                {Math.min(
+                  (table.getState().pagination.pageIndex + 1) *
+                  table.getState().pagination.pageSize,
+                  table.getFilteredRowModel().rows.length
+                )}{" "}
+                of {table.getFilteredRowModel().rows.length} results
+              </span>
+            )}
           </div>
           <div className="flex gap-2">
             <Button
