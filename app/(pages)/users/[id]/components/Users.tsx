@@ -111,6 +111,11 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       enableHiding: false,
     },
     {
+      accessorKey: "intId",
+      header: "intId",
+      cell: ({ row }) => <div>{row.getValue("intId")}</div>,
+    },
+    {
       accessorKey: "serialno",
       header: "ID",
       cell: ({ row }) => <div>{row.getValue("serialno")}</div>,
@@ -551,6 +556,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
               <DropdownMenuContent align="end">
                 {table
                   .getAllColumns()
+                  .filter((column) => column.id === "intid")
                   .filter((column) => column.getCanHide())
                   .map((column) => (
                     <DropdownMenuCheckboxItem
