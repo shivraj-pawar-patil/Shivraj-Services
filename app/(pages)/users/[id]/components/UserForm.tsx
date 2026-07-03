@@ -49,6 +49,7 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
         location: user.city ?? "",
         phone_no: user.phoneNumber ?? "",
         type: user.type ?? "",
+        serialno: user.serialno ?? undefined,
         from_camp: user.from_camp ?? false,
       }
       : {
@@ -57,6 +58,7 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
         location: "",
         phone_no: "",
         type: "",
+        serialno: undefined,
         from_camp: false,
       },
   });
