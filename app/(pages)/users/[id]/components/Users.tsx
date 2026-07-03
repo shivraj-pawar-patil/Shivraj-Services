@@ -80,6 +80,7 @@ export type User = {
 };
 
 export default function DataTableDemo({ users }: { users: User[] }) {
+  console.log("Users data received in DataTableDemo:", users); // Debugging line
 
   // State for filters
   const [type, setType] = React.useState("");
