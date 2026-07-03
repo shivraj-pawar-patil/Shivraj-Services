@@ -58,7 +58,7 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
         location: "",
         phone_no: "",
         type: "",
-        serialno: undefined,
+        serialno: 1 ,
         from_camp: false,
       },
   });
