@@ -81,7 +81,6 @@ export type User = {
 
 export default function DataTableDemo({ users }: { users: User[] }) {
 
-  console.log("Users data received in DataTableDemo:", users); // Debugging line
   // State for filters
   const [type, setType] = React.useState("");
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
@@ -112,7 +111,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       enableHiding: false,
     },
     {
-      accessorKey: "intId",
+      accessorKey: "serialno",
       header: "ID",
       cell: ({ row }) => <div>{row.getValue("serialno")}</div>,
     },
