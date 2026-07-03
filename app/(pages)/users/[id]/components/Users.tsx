@@ -561,7 +561,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                     <DropdownMenuCheckboxItem
                       key={column.id}
                       className="capitalize"
-                      checked={column.id === "intid" ? false : column.getIsVisible()}
+                      checked={column.id === "intId" ? false : column.getIsVisible()}
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
                       }
