@@ -354,7 +354,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     []
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+    React.useState<VisibilityState>({intId: false});
   const [rowSelection, setRowSelection] = React.useState({});
 
   // ✅ Filter by calendar date only
@@ -561,7 +561,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                     <DropdownMenuCheckboxItem
                       key={column.id}
                       className="capitalize"
-                      checked={column.id === "intId" ? false : column.getIsVisible()}
+                      checked={column.getIsVisible()}
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
                       }
