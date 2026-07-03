@@ -15,6 +15,7 @@ datasource db {
 model User {
   intId       Int      @id @default(autoincrement()) @map("int_id")
   id          String   @unique @default(uuid())
+  serialno    Int?
   orgId    String
   from_camp    Boolean    
   name     String

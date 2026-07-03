@@ -67,6 +67,7 @@ const isToday = (date: Date | string) => {
 export type User = {
   id: string;
   intId: number;
+  serialno?: number;
   name: string;
   gender: "female" | "male";
   city: string;
@@ -113,7 +114,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     {
       accessorKey: "intId",
       header: "ID",
-      cell: ({ row }) => <div>{row.getValue("intId")}</div>,
+      cell: ({ row }) => <div>{row.getValue("serialno")}</div>,
     },
     {
       accessorKey: "name",

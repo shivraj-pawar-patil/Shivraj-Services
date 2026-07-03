@@ -8,6 +8,7 @@ async function page() {
     select: {
       id: true,
       intId: true,
+      serialno: true,
       name: true,
       gender: true,
       phoneNumber: true,
