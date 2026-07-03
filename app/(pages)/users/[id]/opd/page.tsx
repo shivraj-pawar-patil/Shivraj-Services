@@ -8,7 +8,7 @@ interface UserPageProps {
   };
 }
 const OpdPage = async ({ params }: UserPageProps) => {
-  const { orgId } = auth()
+  const { orgId , organization } = auth()
   const user = await prisma.user.findUnique({
     where: {
       intId: Number(params.id),
@@ -16,7 +16,7 @@ const OpdPage = async ({ params }: UserPageProps) => {
     },
   });
   
-  return <OpdForm user={user} orgId={orgId!} />;
+  return <OpdForm user={user} organization={organization!} />;
 };
  
 export default OpdPage;

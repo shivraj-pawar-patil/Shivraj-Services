@@ -11,13 +11,13 @@ import {
   Plus, 
   Phone, 
   MapPin, 
-  User, 
   Calendar as CalendarIcon, 
   FileText,
   Activity
 } from "lucide-react";
 import Link from "next/link";
-import { UserFormProps } from "./UserForm";
+import { User } from "@prisma/client";
+import { Organization } from "@clerk/nextjs/server";
 
 interface Medicine {
   id: string;
@@ -27,7 +27,15 @@ interface Medicine {
   duration: string;
 }
 
-function OpdForm({ user, orgId }: UserFormProps) {
+interface Users extends User {
+  info: any;
+}
+export interface UserFormProps {
+  user: Users | null;
+  organization: Organization;
+}
+
+function OpdForm({ user, organization }: UserFormProps ) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -151,7 +159,7 @@ function OpdForm({ user, orgId }: UserFormProps) {
           <div className="border-b-2 border-double border-slate-300 pb-6 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight print:text-black print:text-2xl">
-                SHIVRAJ CLINIC & DIAGNOSTICS
+                {organization?.name || "Shivraj Services"}
               </h2>
               <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mt-1 print:text-slate-800 print:text-xs">
                 Comprehensive Vision & General Healthcare
