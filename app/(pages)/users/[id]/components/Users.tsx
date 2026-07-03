@@ -34,7 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import { deleteUser } from "@/server/user";
+// import { deleteUser } from "@/server/user";
 import { useToast } from "@/components/ui/use-toast";
 import moment from "moment";
 import { useOrganization } from "@clerk/nextjs";
@@ -80,7 +80,6 @@ export type User = {
 };
 
 export default function DataTableDemo({ users }: { users: User[] }) {
-  console.log("Users data received in DataTableDemo:", users); // Debugging line
 
   // State for filters
   const [type, setType] = React.useState("");
@@ -327,6 +326,11 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                   <FaWhatsapp className="mr-2 h-4 w-4" /> WhatsApp
                 </DropdownMenuItem>
               </Link>
+              <Link href={`/users/${row.getValue("intId")}/opd`}>
+                <DropdownMenuItem>
+                  <FaWhatsapp className="mr-2 h-4 w-4" /> OPD
+                </DropdownMenuItem>
+              </Link>
               <Link href={`/users/${row.getValue("intId")}`}>
                 <DropdownMenuItem>
                   <FaUserEdit className="mr-2 h-4 w-4" /> Edit User
@@ -563,7 +567,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {table.getFilteredSelectedRowModel().rows.length > 0 && (
+            {/* {table.getFilteredSelectedRowModel().rows.length > 0 && (
               <Button
                 variant="destructive"
                 size="sm"
@@ -582,7 +586,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
               >
                 Delete
               </Button>
-            )}
+            )} */}
           </div>
         </div>
 
