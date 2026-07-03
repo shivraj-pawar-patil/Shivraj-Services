@@ -556,13 +556,12 @@ export default function DataTableDemo({ users }: { users: User[] }) {
               <DropdownMenuContent align="end">
                 {table
                   .getAllColumns()
-                  .filter((column) => column.id === "intid")
                   .filter((column) => column.getCanHide())
                   .map((column) => (
                     <DropdownMenuCheckboxItem
                       key={column.id}
                       className="capitalize"
-                      checked={column.getIsVisible()}
+                      checked={column.id === "intId" ? false : column.getIsVisible()}
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
                       }
