@@ -30,10 +30,11 @@ export const userSchema = z.object({
           "Pterygium",
           "Spectacles",
           "Follow-up",
+          "OPD",
         ].includes(value),
       {
         message:
-          'Type must be ["Dacryocystitis", "Cataract", "Pterygium", "Spectacles", "Follow-up"]',
+          'Type must be ["Dacryocystitis", "Cataract", "Pterygium", "Spectacles", "Follow-up", "OPD"]',
       }
     ),
 });

@@ -85,6 +85,7 @@ async function page() {
       "Pterygium",
       "Spectacles",
       "Follow-up",
+      "OPD"
     ].map((type) => ({
       type,
       users: getUserTypeCount(type, users),
@@ -138,6 +139,9 @@ async function page() {
                 </Badge>
                 <Badge size="xs" color="blue">
                   Follow-up
+                </Badge>
+                <Badge size="xs" color="blue">
+                  OPD
                 </Badge>
               </div>
 

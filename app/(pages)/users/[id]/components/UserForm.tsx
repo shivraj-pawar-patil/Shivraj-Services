@@ -263,6 +263,7 @@ export const UserForm = ({ user, orgId }: UserFormProps) => {
                             <SelectItem value="Pterygium">Pterygium</SelectItem>
                             <SelectItem value="Spectacles">Spectacles</SelectItem>
                             <SelectItem value="Follow-up">Follow-up</SelectItem>
+                            <SelectItem value="OPD">OPD</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

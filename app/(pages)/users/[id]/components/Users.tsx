@@ -508,6 +508,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                     "Pterygium",
                     "Spectacles",
                     "Follow-up",
+                    "OPD",
                   ].map((item) => (
                     <SelectItem key={item} value={item}>
                       {item}
