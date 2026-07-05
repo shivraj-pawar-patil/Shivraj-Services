@@ -116,12 +116,6 @@ function OpdForm({ user, organization }: UserFormProps ) {
 
   const [prescriptionDate, setPrescriptionDate] = React.useState(todayStr);
 
-  // Formatted print timestamp
-  const printDateStr = React.useMemo(() => {
-    const d = new Date();
-    return d.toLocaleString("en-IN", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
-  }, []);
-
   // States for clinical findings
   const [complaints, setComplaints] = React.useState("");
   const [diagnosis, setDiagnosis] = React.useState("");
@@ -199,6 +193,18 @@ function OpdForm({ user, organization }: UserFormProps ) {
 
           /* Ensure preformatted notes print clearly */
           pre { white-space: pre-wrap; font-family: inherit; font-size: 12pt; }
+
+          /* Compact patient info for print */
+          .patient-info-row { gap: 4px !important; padding-bottom: 4px !important; margin-bottom: 4px !important; }
+          .patient-info-row input,
+          .patient-info-row .font-mono,
+          .patient-info-row span,
+          .patient-info-row p { font-size: 10.5px !important; }
+          .patient-info-row input { padding: 6px 8px !important; }
+          .patient-info-row .text-slate-400 { font-size: 9px !important; }
+          .clinic-letterhead { gap: 4px !important; padding-bottom: 4px !important; margin-bottom: 4px !important; }
+          .clinic-letterhead h2 { font-size: 18px !important; }
+          .clinic-letterhead p { margin-top: 4px !important; }
         }
       `}} />
 
@@ -230,43 +236,36 @@ function OpdForm({ user, organization }: UserFormProps ) {
 
       {/* Main Prescription Card */}
       <Card className="max-w-5xl mx-auto bg-white shadow-xl border-slate-200/80 rounded-2xl overflow-hidden print:border-none print:shadow-none print:rounded-none">
-        <CardContent className="p-8 sm:p-12 print:p-0 print:text-black">
-          
-          {/* Print-only top bar (date + org) */}
-          <div className="hidden print:flex justify-between items-center text-[10px] text-slate-700 mb-2">
-            <span>{printDateStr}</span>
-            <span className="font-semibold">{orgName}</span>
-          </div>
-
+        <CardContent className="p-6 sm:p-8 print:p-0 print:text-black">
           {/* Clinic Letterhead */}
-          <div className="border-b-2 border-double border-slate-300 pb-6 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="clinic-letterhead border-b border-slate-300 pb-4 mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight print:text-black print:text-2xl">
+              <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight print:text-black print:text-2xl">
                 {orgName || "Shivraj Services"}
               </h2>
-              <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mt-1 print:text-slate-800 print:text-xs">
+              <p className="text-xs font-semibold text-indigo-600 uppercase tracking-widest mt-1 print:text-slate-800 print:text-[10px]">
                 {orgInfo.tagline}
               </p>
             </div>
-            <div className="text-slate-500 text-xs md:text-right space-y-1 print:text-black print:text-[10px]">
+            <div className="text-slate-500 text-[11px] md:text-right space-y-1 print:text-black print:text-[10px]">
               <p className="font-semibold text-slate-700 print:font-bold">{orgInfo.doctorName}</p>
-              <p>{orgInfo.address}</p>
-              <p>{orgInfo.contact} {orgInfo.email ? `| ${orgInfo.email}` : ""}</p>
+              <p className="leading-snug">{orgInfo.address}</p>
+              <p className="leading-snug">{orgInfo.contact} {orgInfo.email ? `| ${orgInfo.email}` : ""}</p>
             </div>
           </div>
 
           {/* Patient Info Row */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-8 border-b border-slate-100 pb-6 mb-6 text-sm print:border-slate-300">
+          <div className="patient-info-row grid grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-3 border-b border-slate-100 pb-3 mb-3 text-sm print:border-slate-300">
             {/* Patient Name */}
             <div>
-              <span className="text-slate-400 block text-xs uppercase tracking-wider font-semibold mb-1 print:text-slate-600">
+              <span className="text-slate-400 block text-[11px] uppercase tracking-wider font-semibold mb-1 print:text-slate-600">
                 Patient Name
               </span>
               <input
                 type="text"
                 value={patientName}
                 onChange={(e) => setPatientName(e.target.value)}
-                className="w-full border rounded-md px-3 py-1.5 text-slate-800 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
+                className="w-full border rounded-md px-2.5 py-1 text-slate-800 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
                 placeholder="Enter Name"
               />
               <span className="hidden print:inline font-bold text-slate-900 text-base">{patientName || "—"}</span>
@@ -282,7 +281,7 @@ function OpdForm({ user, organization }: UserFormProps ) {
                   type="text"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  className="w-16 border rounded-md px-3 py-1.5 text-slate-800 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
+                  className="w-16 border rounded-md px-2.5 py-1 text-slate-800 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
                   placeholder="Age"
                 />
                 <span className="hidden print:inline font-bold text-slate-900 text-base">
@@ -303,7 +302,7 @@ function OpdForm({ user, organization }: UserFormProps ) {
                 type="date"
                 value={prescriptionDate}
                 onChange={(e) => setPrescriptionDate(e.target.value)}
-                className="w-full max-w-[180px] border rounded-md px-3 py-1.5 text-slate-800 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
+                className="w-full max-w-[160px] border rounded-md px-2.5 py-1 text-slate-800 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
               />
               <span className="hidden print:inline font-bold text-slate-900 text-base">
                 {prescriptionDate ? new Date(prescriptionDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "—"}
@@ -329,7 +328,7 @@ function OpdForm({ user, organization }: UserFormProps ) {
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full border rounded-md px-3 py-1.5 text-slate-800 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
+                className="w-full border rounded-md px-2.5 py-1 text-slate-800 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
                 placeholder="Enter City"
               />
               <span className="hidden print:inline font-bold text-slate-900 text-base">{city || "—"}</span>
@@ -348,41 +347,6 @@ function OpdForm({ user, organization }: UserFormProps ) {
                 placeholder="Enter Phone"
               />
               <span className="hidden print:inline font-bold text-slate-900 text-base">{phoneNumber || "—"}</span>
-            </div>
-          </div>
-
-          {/* Clinical Findings & Diagnosis */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-slate-100 pb-6 mb-6 print:border-slate-300">
-            {/* Complaints */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-1 print:text-slate-600 flex items-center gap-1.5">
-                <FileText className="h-3.5 w-3.5 no-print" /> Chief Complaints / Symptoms
-              </label>
-              <textarea
-                placeholder="Chief complaints, history of illness..."
-                value={complaints}
-                onChange={(e) => setComplaints(e.target.value)}
-                className="flex min-h-[90px] w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print resize-none"
-              />
-              <p className="hidden print:block text-slate-800 text-sm whitespace-pre-wrap leading-relaxed font-semibold">
-                {complaints || "No complaints recorded."}
-              </p>
-            </div>
-
-            {/* Diagnosis */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-1 print:text-slate-600 flex items-center gap-1.5">
-                <Activity className="h-3.5 w-3.5 no-print" /> Diagnosis / Clinical Findings
-              </label>
-              <textarea
-                placeholder="Diagnosis or clinical findings..."
-                value={diagnosis}
-                onChange={(e) => setDiagnosis(e.target.value)}
-                className="flex min-h-[90px] w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print resize-none"
-              />
-              <p className="hidden print:block text-slate-800 text-sm whitespace-pre-wrap leading-relaxed font-semibold">
-                {diagnosis || "No diagnosis recorded."}
-              </p>
             </div>
           </div>
 
@@ -436,40 +400,40 @@ function OpdForm({ user, organization }: UserFormProps ) {
                 <table className="w-full border-collapse text-left text-sm">
                   <thead>
                     <tr className="border-b border-slate-200 text-slate-400 font-bold text-xs uppercase tracking-wider print:border-slate-300 print:text-black print:text-[10px]">
-                      <th className="py-2.5 w-12 text-center">#</th>
-                      <th className="py-2.5 min-w-[240px]">Medicine Name</th>
-                      <th className="py-2.5 w-44">Dosage Pattern</th>
-                      <th className="py-2.5 w-48">Frequency / Instruction</th>
-                      <th className="py-2.5 w-36">Duration</th>
-                      <th className="py-2.5 w-12 text-right no-print"></th>
+                      <th className="py-2 text-center w-10">#</th>
+                      <th className="py-2 min-w-[220px]">Medicine Name</th>
+                      <th className="py-2 w-40">Dosage</th>
+                      <th className="py-2 w-44">Frequency</th>
+                      <th className="py-2 w-32">Duration</th>
+                      <th className="py-2 w-10 text-right no-print"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {medicines.map((med, index) => (
                       <tr key={med.id} className="border-b border-slate-100 last:border-b-0 print:border-slate-200 print:last:border-b-0">
-                        <td className="py-4 font-bold text-slate-400 align-top text-center print:text-black pt-5">
+                        <td className="py-2 font-bold text-slate-400 align-top text-center print:text-black pt-3">
                           {index + 1}
                         </td>
-                        <td className="py-3 pr-4 align-top">
+                        <td className="py-2 pr-3 align-top">
                           <input
                             type="text"
                             placeholder="e.g. Paracetamol 650 mg"
                             value={med.name}
                             onChange={(e) => updateMedicine(med.id, "name", e.target.value)}
-                            className="w-full border rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
+                            className="w-full border rounded-md px-2.5 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
                           />
                           <span className="hidden print:block font-bold text-slate-900 text-sm pt-2">
                             {med.name || "—"}
                           </span>
                         </td>
-                        <td className="py-3 pr-4 align-top">
-                          <div className="flex flex-col gap-1.5">
+                        <td className="py-2 pr-3 align-top">
+                          <div className="flex flex-col gap-1">
                             <input
                               type="text"
                               placeholder="e.g. 1-0-1"
                               value={med.dosage}
                               onChange={(e) => updateMedicine(med.id, "dosage", e.target.value)}
-                              className="w-full border rounded-md px-3 py-1.5 text-center font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
+                              className="w-full border rounded-md px-2.5 py-1 text-center font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
                             />
                             <span className="hidden print:block text-slate-800 text-sm font-semibold font-mono pt-2">
                               {med.dosage || "—"}
@@ -492,14 +456,14 @@ function OpdForm({ user, organization }: UserFormProps ) {
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 pr-4 align-top">
-                          <div className="flex flex-col gap-1.5">
+                        <td className="py-2 pr-3 align-top">
+                          <div className="flex flex-col gap-1">
                             <input
                               type="text"
                               placeholder="e.g. After Food"
                               value={med.frequency}
                               onChange={(e) => updateMedicine(med.id, "frequency", e.target.value)}
-                              className="w-full border rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
+                              className="w-full border rounded-md px-2.5 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
                             />
                             <span className="hidden print:block text-slate-800 text-sm font-semibold pt-2">
                               {med.frequency || "—"}
@@ -522,14 +486,14 @@ function OpdForm({ user, organization }: UserFormProps ) {
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 pr-4 align-top">
-                          <div className="flex flex-col gap-1.5">
+                        <td className="py-2 pr-3 align-top">
+                          <div className="flex flex-col gap-1">
                             <input
                               type="text"
                               placeholder="e.g. 5 Days"
                               value={med.duration}
                               onChange={(e) => updateMedicine(med.id, "duration", e.target.value)}
-                              className="w-full border rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
+                              className="w-full border rounded-md px-2.5 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
                             />
                             <span className="hidden print:block text-slate-800 text-sm font-semibold pt-2">
                               {med.duration || "—"}
@@ -556,7 +520,7 @@ function OpdForm({ user, organization }: UserFormProps ) {
                           <button
                             type="button"
                             onClick={() => removeMedicine(med.id)}
-                            className="text-slate-400 hover:text-rose-500 transition-colors p-1"
+                            className="text-slate-400 hover:text-rose-500 transition-colors p-0.5"
                             title="Delete Row"
                           >
                             <Trash className="h-4 w-4" />
@@ -574,7 +538,7 @@ function OpdForm({ user, organization }: UserFormProps ) {
                   placeholder="Write notes here for printing or leave blank to use pen on paper..."
                   value={handwrittenNotes}
                   onChange={(e) => setHandwrittenNotes(e.target.value)}
-                  className="w-full min-h-[160px] rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
+                  className="w-full min-h-[500px] rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 no-print"
                 />
 
                 {/* Print representation: either typed notes or blank dashed lines for handwriting */}
@@ -591,7 +555,7 @@ function OpdForm({ user, organization }: UserFormProps ) {
           </div>
 
           {/* Advice / Special instructions & Signature */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-slate-100 pt-6 mt-8 print:border-slate-300">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 border-t border-slate-100 pt-5 mt-6 print:border-slate-300">
             {/* Advice */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-1 print:text-slate-600">

@@ -38,7 +38,7 @@ import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import moment from "moment";
 import { useOrganization } from "@clerk/nextjs";
-import { FaQrcode, FaWhatsapp, FaInfo, FaUserEdit } from "react-icons/fa";
+import { FaQrcode, FaWhatsapp, FaInfo, FaUserEdit, FaBookMedical } from "react-icons/fa";
 import {
   Select,
   SelectContent,
@@ -333,7 +333,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
               </Link>
               <Link href={`/users/${row.getValue("intId")}/opd`}>
                 <DropdownMenuItem>
-                  <FaWhatsapp className="mr-2 h-4 w-4" /> OPD
+                  <FaBookMedical className="mr-2 h-4 w-4" /> OPD
                 </DropdownMenuItem>
               </Link>
               <Link href={`/users/${row.getValue("intId")}`}>
