@@ -9,7 +9,7 @@ import moment from "moment";
 
 export const generateWhatsappMessage = (user: any, organizationName: string) => {
   return `https://wa.me/91${user.phoneNumber}?text=` +
-    `Thank you ${user?.name} for visiting the Lions eye hospital vision center ${organizationName}!` +
+    `Thank you ${user?.name} for visiting the ${organizationName === "Om-Sai Optical" ? `Lions Eye Hospital ${organizationName}` : organizationName}!` +
     "%0a" +
     "ID: " +
     user?.intId +

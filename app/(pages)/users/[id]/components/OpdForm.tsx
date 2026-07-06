@@ -9,16 +9,12 @@ import {
   Printer, 
   Trash, 
   Plus, 
-  Phone, 
-  MapPin, 
   Calendar as CalendarIcon, 
-  FileText,
-  Activity
 } from "lucide-react";
 import Link from "next/link";
 import { User } from "@prisma/client";
 import { Organization } from "@clerk/nextjs/server";
-import { useUser } from "@clerk/nextjs";
+import { useOrganization } from "@clerk/nextjs";
 
 interface Medicine {
   id: string;
@@ -76,9 +72,9 @@ const ORGANIZATIONS: Record<
     email: "support@example.com",
   },
 };
-function OpdForm({ user, organization }: UserFormProps ) {
-  const { user: clerkUser } = useUser()
-  const orgName = clerkUser?.organizationMemberships[0]?.organization.name || "Shivraj Services";
+function OpdForm({ user }: UserFormProps ) {
+  const { organization } = useOrganization()
+  const orgName = organization?.name || "Shivraj Services";
 
 
   const router = useRouter();
