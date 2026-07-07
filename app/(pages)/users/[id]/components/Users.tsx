@@ -38,7 +38,7 @@ import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import moment from "moment";
 import { useOrganization } from "@clerk/nextjs";
-import { FaQrcode, FaWhatsapp, FaInfo, FaUserEdit, FaBookMedical } from "react-icons/fa";
+import { FaQrcode, FaWhatsapp, FaInfo, FaUserEdit, FaBookMedical, FaPrint } from "react-icons/fa";
 import {
   Select,
   SelectContent,
@@ -80,6 +80,105 @@ export type User = {
 };
 
 export default function DataTableDemo({ users }: { users: User[] }) {
+  const handlePrintPrescription = (user: User) => {
+    const printWindow = window.open("", "_blank", "width=900,height=700");
+
+    if (!printWindow) {
+      return;
+    }
+
+    const printDate = user.date
+      ? moment(user.date).format("DD/MM/YYYY")
+      : moment().format("DD/MM/YYYY");
+    const serialNo = user.serialno ?? user.intId ?? "-";
+
+    const backgroundImage = "/preception.jpeg";
+    const safeName = (user.name || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safeCity = (user.city || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safePhone = (user.phoneNumber || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safeAge = (user.info.age || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>Patient Print</title>
+        <style>
+          @page { size: A4 portrait; margin: 0; }
+          html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+          }
+          body { font-family: Arial, sans-serif; }
+          .page {
+            width: 210mm;
+            height: 297mm;
+            margin: 0;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+          }
+          .page img {
+            display: block;
+            width: 210mm;
+            height: 297mm;
+            object-fit: contain;
+          }
+          .field {
+            position: absolute;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            line-height: 1.3;
+            z-index: 2;
+          }
+          .serial { top: 230px; left: 557px; }
+          .date { top: 230px; left: 319px; }
+          .age {  top: 230px; left: 446px; }
+          .name { top: 264px; left: 407px; }
+          // .and { top: 264px; left: 413px; }
+          .mobile { top: 289px; left: 611px; }
+          .address { top: 297px; left: 312px; width: 450px; }
+          @media print {
+            body { margin: 0; }
+            .page {
+              margin: 0;
+              width: 210mm;
+              height: 297mm;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="page">
+          <img src="${backgroundImage}" alt="Patient form background" />
+          <div class="field serial">${serialNo}</div>
+          <div class="field date">${printDate}</div>
+          <div class="field age">${safeAge}</div>
+          <div class="field name">${safeName}</div>
+          // <div class="field and">,</div>
+          <div class="field mobile">${safePhone}</div>
+          <div class="field address">${safeCity}</div>
+        </div>
+        // <script>
+        //   window.addEventListener('load', () => {
+        //     setTimeout(() => {
+        //       window.print();
+        //       window.close();
+        //     }, 500);
+        //   });
+        // </script>
+      </body>
+      </html>
+    `);
+
+    // printWindow.document.close();
+    printWindow.focus();
+  };
 
   // State for filters
   const [type, setType] = React.useState("");
@@ -331,11 +430,22 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                   <FaWhatsapp className="mr-2 h-4 w-4" /> WhatsApp
                 </DropdownMenuItem>
               </Link>
-              <Link href={`/users/${row.getValue("intId")}/opd`}>
-                <DropdownMenuItem>
-                  <FaBookMedical className="mr-2 h-4 w-4" /> OPD
+              {organization?.name === "पेडगावकर नेत्र रुग्णालय" ? (
+                <DropdownMenuItem
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    handlePrintPrescription(row.original);
+                  }}
+                >
+                  <FaPrint className="mr-2 h-4 w-4" /> Print prescription
                 </DropdownMenuItem>
-              </Link>
+              ) : (
+                <Link href={`/users/${row.getValue("intId")}/opd`}>
+                  <DropdownMenuItem>
+                    <FaBookMedical className="mr-2 h-4 w-4" /> OPD
+                  </DropdownMenuItem>
+                </Link>
+              )}
               <Link href={`/users/${row.getValue("intId")}`}>
                 <DropdownMenuItem>
                   <FaUserEdit className="mr-2 h-4 w-4" /> Edit User
@@ -354,7 +464,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     []
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({intId: false});
+    React.useState<VisibilityState>({ intId: false });
   const [rowSelection, setRowSelection] = React.useState({});
 
   // ✅ Filter by calendar date only
