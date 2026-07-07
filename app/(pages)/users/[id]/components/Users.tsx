@@ -140,7 +140,6 @@ export default function DataTableDemo({ users }: { users: User[] }) {
           .date { top: 230px; left: 319px; }
           .age {  top: 230px; left: 446px; }
           .name { top: 264px; left: 407px; }
-          // .and { top: 264px; left: 413px; }
           .mobile { top: 289px; left: 611px; }
           .address { top: 297px; left: 312px; width: 450px; }
           @media print {
@@ -155,28 +154,26 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       </head>
       <body>
         <div class="page">
-          <img src="${backgroundImage}" alt="Patient form background" />
           <div class="field serial">${serialNo}</div>
           <div class="field date">${printDate}</div>
           <div class="field age">${safeAge}</div>
           <div class="field name">${safeName}</div>
-          // <div class="field and">,</div>
           <div class="field mobile">${safePhone}</div>
           <div class="field address">${safeCity}</div>
         </div>
-        // <script>
-        //   window.addEventListener('load', () => {
-        //     setTimeout(() => {
-        //       window.print();
-        //       window.close();
-        //     }, 500);
-        //   });
-        // </script>
+        <script>
+          window.addEventListener('load', () => {
+            setTimeout(() => {
+              window.print();
+              window.close();
+            }, 500);
+          });
+        </script>
       </body>
       </html>
     `);
 
-    // printWindow.document.close();
+    printWindow.document.close();
     printWindow.focus();
   };
 
