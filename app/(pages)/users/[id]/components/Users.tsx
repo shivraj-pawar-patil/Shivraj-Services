@@ -87,16 +87,14 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       return;
     }
 
-    const printDate = user.date
-      ? moment(user.date).format("DD/MM/YYYY")
-      : moment().format("DD/MM/YYYY");
+    const printDate = moment().format("DD/MM/YYYY");
     const serialNo = user.serialno ?? user.intId ?? "-";
 
     const backgroundImage = "/preception.jpeg";
     const safeName = (user.name || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const safeCity = (user.city || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const safePhone = (user.phoneNumber || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const safeAge = (user.info.age || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safeAge = (user?.info?.age || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
     printWindow.document.write(`
       <!DOCTYPE html>
