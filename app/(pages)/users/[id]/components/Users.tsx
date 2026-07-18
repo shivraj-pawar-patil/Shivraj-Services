@@ -138,8 +138,8 @@ export default function DataTableDemo({ users }: { users: User[] }) {
           .date { top: 174px; left: 319px; }
           .age {  top: 174px; left: 448px; }
           .name { top: 216px; left: 407px; }
-          .mobile { top: 244px; left: 611px; }
-          .address { top: 244px; left: 312px; width: 450px; }
+          .mobile { top: 241px; left: 611px; }
+          .address { top: 247px; left: 312px; width: 450px; }
           @media print {
             body { margin: 0; }
             .page {
