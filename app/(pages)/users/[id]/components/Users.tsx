@@ -137,9 +137,9 @@ export default function DataTableDemo({ users }: { users: User[] }) {
           .serial { top: 174px; left: 557px; }
           .date { top: 174px; left: 319px; }
           .age {  top: 174px; left: 448px; }
-          .name { top: 221px; left: 407px; }
-          .mobile { top: 248px; left: 611px; }
-          .address { top: 259px; left: 312px; width: 450px; }
+          .name { top: 216px; left: 407px; }
+          .mobile { top: 244px; left: 611px; }
+          .address { top: 244px; left: 312px; width: 450px; }
           @media print {
             body { margin: 0; }
             .page {
@@ -171,7 +171,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       </html>
     `);
 
-    printWindow.document.close();
+    // printWindow.document.close();
     printWindow.focus();
   };
 
