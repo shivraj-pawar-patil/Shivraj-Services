@@ -171,7 +171,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       </html>
     `);
 
-    // printWindow.document.close();
+    printWindow.document.close();
     printWindow.focus();
   };
 
