@@ -134,12 +134,12 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             line-height: 1.3;
             z-index: 2;
           }
-          .serial { top: 172px; left: 557px; }
-          .date { top: 172px; left: 319px; }
-          .age {  top: 172px; left: 446px; }
-          .name { top: 223px; left: 407px; }
-          .mobile { top: 262px; left: 611px; }
-          .address { top: 262px; left: 312px; width: 450px; }
+          .serial { top: 174px; left: 557px; }
+          .date { top: 174px; left: 319px; }
+          .age {  top: 174px; left: 448px; }
+          .name { top: 221px; left: 407px; }
+          .mobile { top: 259px; left: 611px; }
+          .address { top: 259px; left: 312px; width: 450px; }
           @media print {
             body { margin: 0; }
             .page {
@@ -171,7 +171,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
       </html>
     `);
 
-    printWindow.document.close();
+    // printWindow.document.close();
     printWindow.focus();
   };
 
