@@ -8,8 +8,6 @@ import {
   VisibilityState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
@@ -34,6 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 // import { deleteUser } from "@/server/user";
 import { useToast } from "@/components/ui/use-toast";
 import moment from "moment";
@@ -79,7 +78,28 @@ export type User = {
   updatedAt?: Date | string;
 };
 
-export default function DataTableDemo({ users }: { users: User[] }) {
+type UserFilters = {
+  search: string;
+  camp: boolean;
+  type: string;
+  date: string;
+};
+
+export default function DataTableDemo({
+  users,
+  totalCount,
+  pageIndex,
+  pageSize,
+  filters,
+}: {
+  users: User[];
+  totalCount: number;
+  pageIndex: number;
+  pageSize: number;
+  filters: UserFilters;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
   const handlePrintPrescription = (user: User) => {
     const printWindow = window.open("", "_blank", "width=900,height=700");
 
@@ -176,9 +196,9 @@ export default function DataTableDemo({ users }: { users: User[] }) {
   };
 
   // State for filters
-  const [type, setType] = React.useState("");
+  const [type, setType] = React.useState(filters.type);
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
-    undefined
+    filters.date ? new Date(filters.date) : undefined
   );
 
   const columns: ColumnDef<User>[] = [
@@ -463,37 +483,16 @@ export default function DataTableDemo({ users }: { users: User[] }) {
   const [rowSelection, setRowSelection] = React.useState({});
 
   // ✅ Filter by calendar date only
-  const filteredUsers = React.useMemo(() => {
-    let data = [...users].sort((a, b) => {
-      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-      if (dateB !== dateA) {
-        return dateB - dateA;
-      }
-      return b.intId - a.intId;
-    });
-
-    if (selectedDate) {
-      data = data.filter(
-        (user) =>
-          moment(user.date).isSame(moment(selectedDate), "day") ||
-          (user.updatedAt &&
-            moment(user.updatedAt).isSame(moment(selectedDate), "day"))
-      );
-    }
-
-    return data;
-  }, [users, selectedDate]);
-
   const table = useReactTable({
-    data: filteredUsers,
+    data: users,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    manualPagination: true,
+    manualFiltering: true,
+    pageCount: Math.ceil(totalCount / pageSize),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
@@ -504,6 +503,23 @@ export default function DataTableDemo({ users }: { users: User[] }) {
     },
   });
 
+  const updateQuery = (updates: Record<string, string | undefined>) => {
+    const query = new URLSearchParams();
+    const values = {
+      q: filters.search,
+      camp: filters.camp ? "true" : undefined,
+      type: filters.type,
+      date: filters.date,
+      page: String(pageIndex + 1),
+      ...updates,
+    };
+    Object.entries(values).forEach(([key, value]) => {
+      if (value) query.set(key, value);
+    });
+    if (!updates.page) query.set("page", "1");
+    router.replace(`${pathname}?${query.toString()}`);
+  };
+
   return (
     <div className="w-full p-4 md:p-6 min-h-screen bg-background">
       <div className="space-y-4">
@@ -512,7 +528,7 @@ export default function DataTableDemo({ users }: { users: User[] }) {
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-foreground">Patients</h1>
             <Badge variant="secondary" className="text-sm">
-              {table.getFilteredRowModel().rows.length}
+              {totalCount}
             </Badge>
           </div>
           <div className="flex items-center gap-2 ml-auto">
@@ -530,11 +546,9 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             {/* Search Filter */}
             <Input
               placeholder="Filter by name..."
-              value={
-                (table.getColumn("name")?.getFilterValue() as string) ?? ""
-              }
+              value={filters.search}
               onChange={(event) =>
-                table.getColumn("name")?.setFilterValue(event.target.value)
+                updateQuery({ q: event.target.value || undefined })
               }
               className="w-full max-w-sm sm:max-w-xs"
             />
@@ -542,18 +556,12 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             {/* From Camp Filter */}
             <Button
               variant={
-                table.getColumn("from_camp")?.getFilterValue() === true
+                filters.camp
                   ? "default"
                   : "outline"
               }
               onClick={() => {
-                const currentFilter =
-                  table.getColumn("from_camp")?.getFilterValue();
-                if (currentFilter === true) {
-                  table.getColumn("from_camp")?.setFilterValue(undefined);
-                } else {
-                  table.getColumn("from_camp")?.setFilterValue(true);
-                }
+                updateQuery({ camp: filters.camp ? undefined : "true" });
               }}
               className="w-full sm:w-auto"
             >
@@ -576,7 +584,10 @@ export default function DataTableDemo({ users }: { users: User[] }) {
                 <Calendar
                   mode="single"
                   selected={selectedDate}
-                  onSelect={(date) => setSelectedDate(date)}
+                  onSelect={(date) => {
+                    setSelectedDate(date);
+                    updateQuery({ date: date ? moment(date).format("YYYY-MM-DD") : undefined });
+                  }}
                   initialFocus
                   modifiers={{
                     today: new Date(),
@@ -592,7 +603,10 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             {selectedDate && (
               <Button
                 variant="outline"
-                onClick={() => setSelectedDate(undefined)}
+                onClick={() => {
+                  setSelectedDate(undefined);
+                  updateQuery({ date: undefined });
+                }}
                 className="w-full sm:w-auto"
               >
                 Clear Date
@@ -603,12 +617,10 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             <div>
               <Select
                 onValueChange={(value) => {
-                  table
-                    .getColumn("type")
-                    ?.setFilterValue(
-                      value !== "Select Type Of Patient" ? value : undefined
-                    );
                   setType(value);
+                  updateQuery({
+                    type: value !== "Select Type Of Patient" ? value : undefined,
+                  });
                 }}
                 value={type}
               >
@@ -634,13 +646,13 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             </div>
 
             {/* Reset Filters */}
-            {(type || selectedDate || table.getState().columnFilters.length > 0) && (
+            {(filters.search || filters.camp || filters.type || filters.date) && (
               <Button
                 variant="ghost"
                 onClick={() => {
                   setType("");
                   setSelectedDate(undefined);
-                  table.resetColumnFilters();
+                  updateQuery({ q: undefined, camp: undefined, type: undefined, date: undefined });
                 }}
                 className="px-2 lg:px-3"
               >
@@ -764,21 +776,18 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             {table.getFilteredSelectedRowModel().rows.length > 0 ? (
               <span>
                 {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                {table.getFilteredRowModel().rows.length} row(s) selected.
+                {totalCount} row(s) selected.
               </span>
             ) : (
               <span>
                 Showing{" "}
-                {table.getState().pagination.pageIndex *
-                  table.getState().pagination.pageSize +
-                  1}{" "}
+                {Math.min(pageIndex * pageSize + 1, totalCount)}{" "}
                 to{" "}
                 {Math.min(
-                  (table.getState().pagination.pageIndex + 1) *
-                  table.getState().pagination.pageSize,
-                  table.getFilteredRowModel().rows.length
+                  (pageIndex + 1) * pageSize,
+                  totalCount
                 )}{" "}
-                of {table.getFilteredRowModel().rows.length} results
+                of {totalCount} results
               </span>
             )}
           </div>
@@ -786,8 +795,8 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+              onClick={() => updateQuery({ page: String(pageIndex) })}
+              disabled={pageIndex === 0}
               className="w-full sm:w-auto"
             >
               Previous
@@ -795,8 +804,8 @@ export default function DataTableDemo({ users }: { users: User[] }) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
+              onClick={() => updateQuery({ page: String(pageIndex + 2) })}
+              disabled={pageIndex + 1 >= Math.ceil(totalCount / pageSize)}
               className="w-full sm:w-auto"
             >
               Next
