@@ -63,24 +63,6 @@ const isToday = (date: Date | string) => {
   return checkDate.isSame(moment(), "day");
 };
 
-const getDailySrNumber = (user: User, userList: User[]) => {
-  const todayKey = moment().format("YYYY-MM-DD");
-
-  const todaysUsers = userList
-    .filter((entry) => moment(entry.date).format("YYYY-MM-DD") === todayKey)
-    .sort((a, b) => {
-      const aTime = new Date(a.date ?? a.updatedAt ?? 0).getTime();
-      const bTime = new Date(b.date ?? b.updatedAt ?? 0).getTime();
-      return aTime - bTime;
-    });
-
-  const matchedIndex = todaysUsers.findIndex(
-    (entry) => entry.id === user.id || entry.intId === user.intId
-  );
-
-  return matchedIndex >= 0 ? matchedIndex + 1 : 1;
-};
-
 export type User = {
   id: string;
   intId: number;
@@ -118,7 +100,9 @@ export default function DataTableDemo({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const handlePrintPrescription = (user: User) => {
+  const { organization } = useOrganization();
+
+  const handlePrintPrescription = async (user: User) => {
     const printWindow = window.open("", "_blank", "width=900,height=700");
 
     if (!printWindow) {
@@ -127,7 +111,24 @@ export default function DataTableDemo({
 
     const printDate = moment().format("DD/MM/YYYY");
     const serialNo = user.serialno ?? user.intId ?? "-";
-    const srNo = getDailySrNumber(user, users);
+
+    let srNo = serialNo;
+    try {
+      const response = await fetch(
+        `/api/users/daily-sr?intId=${user.intId}${user.id ? `&userId=${user.id}` : ""}&orgId=${organization?.id ?? ""}`,
+        { cache: "no-store" }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (typeof data?.srNo === "number") {
+          srNo = data.srNo;
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch daily SR number", error);
+    }
+
     const backgroundImage = "/preception.jpeg";
     const safeName = (user.name || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const safeCity = (user.city || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -211,7 +212,7 @@ export default function DataTableDemo({
       </html>
     `);
 
-    printWindow.document.close();
+    // printWindow.document.close();
     printWindow.focus();
   };
 
