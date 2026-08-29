@@ -63,6 +63,24 @@ const isToday = (date: Date | string) => {
   return checkDate.isSame(moment(), "day");
 };
 
+const getDailySrNumber = (user: User, userList: User[]) => {
+  const todayKey = moment().format("YYYY-MM-DD");
+
+  const todaysUsers = userList
+    .filter((entry) => moment(entry.date).format("YYYY-MM-DD") === todayKey)
+    .sort((a, b) => {
+      const aTime = new Date(a.date ?? a.updatedAt ?? 0).getTime();
+      const bTime = new Date(b.date ?? b.updatedAt ?? 0).getTime();
+      return aTime - bTime;
+    });
+
+  const matchedIndex = todaysUsers.findIndex(
+    (entry) => entry.id === user.id || entry.intId === user.intId
+  );
+
+  return matchedIndex >= 0 ? matchedIndex + 1 : 1;
+};
+
 export type User = {
   id: string;
   intId: number;
@@ -109,7 +127,7 @@ export default function DataTableDemo({
 
     const printDate = moment().format("DD/MM/YYYY");
     const serialNo = user.serialno ?? user.intId ?? "-";
-
+    const srNo = getDailySrNumber(user, users);
     const backgroundImage = "/preception.jpeg";
     const safeName = (user.name || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const safeCity = (user.city || "-").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -154,6 +172,7 @@ export default function DataTableDemo({
             line-height: 1.3;
             z-index: 2;
           }
+          .sr { font-size: 12px; top: 243px; left: 704px; }
           .serial { top: 174px; left: 557px; }
           .date { top: 174px; left: 319px; }
           .age {  top: 174px; left: 448px; }
@@ -172,6 +191,7 @@ export default function DataTableDemo({
       </head>
       <body>
         <div class="page">
+          <div class="field sr">srNo:-${srNo}</div>
           <div class="field serial">${serialNo}</div>
           <div class="field date">${printDate}</div>
           <div class="field age">${safeAge}</div>
