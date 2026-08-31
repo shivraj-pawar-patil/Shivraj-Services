@@ -212,7 +212,7 @@ export default function DataTableDemo({
       </html>
     `);
 
-    // printWindow.document.close();
+    printWindow.document.close();
     printWindow.focus();
   };
 
